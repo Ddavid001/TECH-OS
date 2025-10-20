@@ -18,18 +18,18 @@ const Login = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirigir si ya está logueado
   useEffect(() => {
-    if (!loading && user && userRole) {
+    if (user) {
       const dashboardMap = {
         admin: '/admin/dashboard',
         teacher: '/teacher/dashboard',
         student: '/student/dashboard',
         representative: '/representative/dashboard',
       };
-      navigate(dashboardMap[userRole], { replace: true });
+      const destination = userRole ? dashboardMap[userRole] : '/profile';
+      navigate(destination, { replace: true });
     }
-  }, [user, userRole, loading, navigate]);
+  }, [user, userRole, navigate]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -134,7 +134,7 @@ const Login = () => {
             </div>
 
             <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
-              <FcGoogle className="mr-2 h-5 w-5" />
+              <span className="mr-2 h-5 w-5"><FcGoogle /></span>
               Continuar con Google
             </Button>
           </CardContent>
