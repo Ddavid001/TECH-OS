@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { db } from '@/lib/supabase-helper';
 import { FileText, Trash2, Upload } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MaterialsModalProps {
   open: boolean;
@@ -38,6 +38,7 @@ export const MaterialsModal = ({
   dayName,
 }: MaterialsModalProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);

@@ -8,11 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { db } from '@/lib/supabase-helper';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const Profile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');

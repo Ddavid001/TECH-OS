@@ -1,124 +1,177 @@
-# Welcome to your TECH SO
+# TechOS - Academic Continuity Platform
 
-A robust, multi-tenant SaaS application designed to solve academic disruption caused by student and teacher absenteeism. PCA ensures that learning never stops by connecting teachers, students, and representatives in a seamless, real-time ecosystem.
+Una plataforma completa para la gestión educativa que conecta profesores, estudiantes y representantes en tiempo real.
 
----
+## 🚀 Características
 
-##  About The Project
+- **Dashboard de Administrador**: Gestión completa de usuarios, cursos y estadísticas
+- **Dashboard de Profesor**: Gestión de cursos, materiales y asistencia
+- **Dashboard de Estudiante**: Visualización de horarios y cursos
+- **Dashboard de Representante**: Seguimiento de asistencia de estudiantes vinculados
+- **Autenticación segura** con Supabase
+- **Interfaz multilingüe** (Español/Inglés)
+- **Gestión de archivos** para materiales de clase
+- **Sistema de roles** con permisos granulares
 
-In many educational institutions, absenteeism disrupts the learning process, creates administrative overhead, and leads to poor academic outcomes. Traditional methods like manual tracking and informal communication channels (like WhatsApp) are inefficient, unprofessional, and chaotic.
+## 🛠️ Tecnologías
 
-The **TECH SO** was built to address this challenge head-on. It's not just another school management system; it's a dedicated platform to guarantee that the educational process continues, even when a teacher or student is physically absent. By providing clear, role-based dashboards and a powerful "Continuity Protocol," PCA transforms a problem into a managed process.
+- **Frontend**: React 18, TypeScript, Vite
+- **UI**: Tailwind CSS, shadcn/ui, Radix UI
+- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **Routing**: React Router v6
+- **Estado**: React Query (TanStack Query)
+- **Formularios**: React Hook Form + Zod
+- **Internacionalización**: i18next
 
-###  Key Features:
+## 📋 Prerrequisitos
 
-* **Multi-Role Dashboards:** Clean, intuitive interfaces tailored for Admins, Teachers, Students, and Representatives.
-* **Real-Time Attendance:** Teachers can take attendance in seconds from a mobile-friendly interface.
-* **Continuity Protocol:** Teachers can notify future absences and automatically release class materials, ensuring students never miss a learning opportunity.
-* **Instant Notifications:** Representatives are instantly notified of their child's absence, fostering a collaborative school-home environment.
-* **Secure & Scalable:** Built on Supabase with robust Row-Level Security to ensure data is private and secure for each institution.
-* **Multilingual Support:** Ready for both English and Spanish-speaking users with `i18next` integration.
+- Node.js 18+ 
+- npm o yarn
+- Cuenta de Supabase
 
----
+## 🚀 Instalación
 
- Built With
+1. **Clonar el repositorio**
+```bash
+git clone <repository-url>
+cd TechOS
+```
 
-* **Frontend:** [React](https://reactjs.org/) & [Vite](https://vitejs.dev/)
-* **UI Components:** [Shadcn/ui](https://ui.shadcn.com/)
-* **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-* **Backend & Auth:** [Supabase](https://supabase.io/)
-* **Internationalization:** [i18next](https://www.i18next.com/)
+2. **Instalar dependencias**
+```bash
+npm install
+```
 
----
+3. **Configurar variables de entorno**
+```bash
+cp env.example .env.local
+```
 
-Getting Started
+Edita `.env.local` con tus credenciales de Supabase:
+```env
+VITE_SUPABASE_URL=tu_url_de_supabase
+VITE_SUPABASE_PUBLISHABLE_KEY=tu_clave_publica_de_supabase
+```
 
-To get a local copy up and running, follow these simple steps.
+4. **Configurar Supabase**
+   - Crea un nuevo proyecto en [Supabase](https://supabase.com)
+   - Ejecuta las migraciones SQL desde `supabase/migrations/`
+   - Configura las políticas RLS (Row Level Security)
+   - Habilita el bucket de almacenamiento para materiales
 
-### Installation
-
-1.  **Clone the repo**
-    ```sh
-    git clone [https://github.com/your_username/your_repository_name.git](https://github.com/your_username/your_repository_name.git)
-    ```
-2.  **Navigate to the project directory**
-    ```sh
-    cd your_repository_name
-    ```
-3.  **Install NPM packages**
-    ```sh
-    npm install
-    ```
-4.  **Set up your environment variables**
-    * Rename the `.env.local.example` file to `.env.local`.
-    * Log in to your Supabase project.
-    * Go to `Project Settings` > `API`.
-    * Copy your `Project URL` and `anon (public) Key` and paste them into your `.env.local` file:
-        ```env
-        VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
-        VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-        ```
-
-5.  **Set up the Supabase database**
-    * In the Supabase SQL Editor, run the SQL schema file located in the `supabase/schema.sql` directory of this project to create all the necessary tables and policies.
-    * Remember to create the `createNewUser` Edge Function as well.
-
-6.  **Run the development server**
-    ```sh
-    npm run dev
-    ```
-    Your application should now be running on `http://localhost:5173`.
-
----
-
-##  License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-**Use your preferred IDE**
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+5. **Ejecutar en desarrollo**
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🗄️ Base de Datos
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+El proyecto incluye las siguientes tablas principales:
 
-Use GitHub Codespaces
+- **institutions**: Instituciones educativas
+- **profiles**: Perfiles de usuarios (extiende auth.users)
+- **courses**: Cursos
+- **enrollments**: Inscripciones de estudiantes
+- **schedules**: Horarios de clases
+- **attendance_records**: Registros de asistencia
+- **class_materials**: Materiales de clase
+- **teacher_absences**: Ausencias de profesores
+- **representative_links**: Vínculos representante-estudiante
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🔐 Autenticación y Roles
 
-What technologies are used for this project?
+El sistema maneja 4 tipos de usuarios:
 
-This project is built with:
+1. **Admin**: Gestión completa del sistema
+2. **Teacher**: Gestión de cursos y materiales
+3. **Student**: Acceso a horarios y cursos
+4. **Representative**: Seguimiento de estudiantes vinculados
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📱 Pantallas Principales
 
+### Dashboard de Administrador
+- Estadísticas generales
+- Gestión de usuarios (CRUD)
+- Vista de cursos y asistencia
 
+### Dashboard de Profesor
+- Clases del día
+- Gestión de cursos
+- Subida de materiales
+- Registro de asistencia
 
+### Dashboard de Estudiante
+- Horario del día
+- Cursos inscritos
+- Materiales disponibles
 
+### Dashboard de Representante
+- Seguimiento de asistencia
+- Estudiantes vinculados
+- Historial de registros
+
+## 🚀 Despliegue
+
+### Build de Producción
+```bash
+npm run build
+```
+
+### Variables de Entorno de Producción
+Asegúrate de configurar las variables de entorno en tu plataforma de despliegue:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## 🔧 Scripts Disponibles
+
+- `npm run dev` - Servidor de desarrollo
+- `npm run build` - Build de producción
+- `npm run preview` - Preview del build
+- `npm run lint` - Linter
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── components/          # Componentes reutilizables
+│   ├── admin/          # Componentes específicos de admin
+│   ├── teacher/       # Componentes específicos de profesor
+│   └── ui/            # Componentes de UI base
+├── hooks/             # Custom hooks
+├── integrations/       # Integraciones externas (Supabase)
+├── lib/               # Utilidades y helpers
+├── pages/             # Páginas principales
+├── i18n/              # Configuración de internacionalización
+└── main.tsx           # Punto de entrada
+```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## 🆘 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la documentación de Supabase
+2. Verifica las variables de entorno
+3. Asegúrate de que las migraciones se ejecutaron correctamente
+4. Abre un issue en el repositorio
+
+## 🔄 Actualizaciones Futuras
+
+- [ ] Notificaciones en tiempo real
+- [ ] Sistema de calificaciones
+- [ ] Chat entre usuarios
+- [ ] Reportes avanzados
+- [ ] App móvil
+- [ ] Integración con calendarios externos

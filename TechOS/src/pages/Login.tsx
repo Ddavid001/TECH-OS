@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap } from 'lucide-react';
-import { FcGoogle } from 'react-icons/fc'; // Icono de Google
+// import { FcGoogle } from 'react-icons/fc'; // Icono de Google
 
 const Login = () => {
   const navigate = useNavigate();
@@ -80,9 +80,14 @@ const Login = () => {
     }
   };
 
-  if (loading) {
-    return null; // Muestra una pantalla en blanco o un spinner mientras carga
-  }
+ if (loading) {
+  // Muestra un indicador de carga centrado
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div>Cargando...</div>
+    </div>
+  );
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -134,7 +139,7 @@ const Login = () => {
             </div>
 
             <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
-              <span className="mr-2 h-5 w-5"><FcGoogle /></span>
+              <span className="mr-2 h-5 w-5">G</span>
               Continuar con Google
             </Button>
           </CardContent>

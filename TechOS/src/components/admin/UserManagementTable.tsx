@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,14 +24,14 @@ interface UserManagementTableProps {
 
 export const UserManagementTable = ({ users, isLoading, onEdit, onRefresh }: UserManagementTableProps) => {
   const { toast } = useToast();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
       return;
     }
 
-    setDeletingId(userId);
+    setDeletingUserId(userId);
     try {
       const { error } = await supabase.functions.invoke('delete-user', {
         body: { userId },
@@ -38,99 +39,154 @@ export const UserManagementTable = ({ users, isLoading, onEdit, onRefresh }: Use
 
       if (error) throw error;
 
-      toast({
-        title: 'Success',
-        description: 'User deleted successfully',
+      toast({ 
+        title: 'Éxito', 
+        description: 'Usuario eliminado correctamente.' 
       });
+      
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to delete user',
+        title: 'Error al eliminar',
+        description: error.message || 'No se pudo eliminar el usuario',
         variant: 'destructive',
       });
     } finally {
-      setDeletingId(null);
+      setDeletingUserId(null);
     }
   };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'default';
+        return 'destructive';
       case 'teacher':
-        return 'secondary';
+        return 'default';
       case 'student':
+        return 'secondary';
+      case 'representative':
         return 'outline';
       default:
-        return 'outline';
+        return 'secondary';
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Admin';
+      case 'teacher':
+        return 'Teacher';
+      case 'student':
+        return 'Student';
+      case 'representative':
+        return 'Representative';
+      default:
+        return role;
     }
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-16 animate-pulse rounded-lg bg-muted" />
-        ))}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-16" /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Full Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.length === 0 ? (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Users ({users.length})</h3>
+        <Button onClick={onRefresh} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </Button>
+      </div>
+
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={4} className="text-center text-muted-foreground">
-                No users found
-              </TableCell>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ) : (
-            users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  {user.first_name} {user.last_name}
-                </TableCell>
-                <TableCell>{user.email || 'N/A'}</TableCell>
-                <TableCell>
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(user)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(user.id)}
-                      disabled={deletingId === user.id}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+          </TableHeader>
+          <TableBody>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  No users found
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {user.first_name} {user.last_name}
+                  </TableCell>
+                  <TableCell>{user.email || 'No email'}</TableCell>
+                  <TableCell>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleLabel(user.role)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        onClick={() => onEdit(user)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDelete(user.id)}
+                        variant="ghost"
+                        size="sm"
+                        disabled={deletingUserId === user.id}
+                      >
+                        {deletingUserId === user.id ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
