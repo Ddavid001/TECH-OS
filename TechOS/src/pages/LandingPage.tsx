@@ -26,7 +26,7 @@ const LandingPage = () => {
       {/* Content */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <h1 className="mb-6 text-5xl font-bold text-white md:text-6xl lg:text-7xl">
-          Academic Continuity, Guaranteed.
+          TECH OS 
         </h1>
         
         <p className="mb-12 max-w-2xl text-lg text-white/90 md:text-xl">

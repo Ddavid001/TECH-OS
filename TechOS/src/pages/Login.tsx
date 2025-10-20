@@ -1,3 +1,5 @@
+// TechOS/src/pages/Login.tsx
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc'; // Icono de Google
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ const Login = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already logged in
+  // Redirigir si ya está logueado
   useEffect(() => {
     if (!loading && user && userRole) {
       const dashboardMap = {
@@ -46,13 +48,13 @@ const Login = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'You have been logged in successfully.',
+        title: 'Éxito',
+        description: 'Has iniciado sesión correctamente.',
       });
     } catch (error: any) {
       toast({
-        title: 'Login Failed',
-        description: error.message || 'Invalid email or password.',
+        title: 'Fallo de inicio de sesión',
+        description: error.message || 'Email o contraseña inválidos.',
         variant: 'destructive',
       });
     } finally {
@@ -60,43 +62,17 @@ const Login = () => {
     }
   };
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('signup-email') as string;
-    const password = formData.get('signup-password') as string;
-    const firstName = formData.get('signup-firstname') as string;
-    const lastName = formData.get('signup-lastname') as string;
-
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            // Note: In production, you'd need to handle institution_id and role
-            // This is a simplified version for demonstration
-          },
-        },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
       });
-
       if (error) throw error;
-
-      toast({
-        title: 'Success',
-        description: 'Account created! You can now log in.',
-      });
     } catch (error: any) {
       toast({
-        title: 'Signup Failed',
-        description: error.message || 'Failed to create account.',
+        title: 'Error de Google',
+        description: error.message || 'No se pudo iniciar sesión con Google.',
         variant: 'destructive',
       });
     } finally {
@@ -105,7 +81,7 @@ const Login = () => {
   };
 
   if (loading) {
-    return null;
+    return null; // Muestra una pantalla en blanco o un spinner mientras carga
   }
 
   return (
@@ -121,95 +97,46 @@ const Login = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>Sign in to your account or create a new one</CardDescription>
+            <CardTitle>Bienvenido</CardTitle>
+            <CardDescription>Inicia sesión en tu cuenta</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="login-email">Email</Label>
+                <Input
+                  id="login-email"
+                  name="login-email"
+                  type="email"
+                  placeholder="tu@ejemplo.com"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password">Contraseña</Label>
+                <Input
+                  id="login-password"
+                  name="login-password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              </Button>
+            </form>
 
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      name="login-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      name="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing in...' : 'Sign In'}
-                  </Button>
-                </form>
-              </TabsContent>
+            <div className="my-4 flex items-center">
+              <div className="flex-grow border-t border-muted"></div>
+              <span className="mx-4 text-xs uppercase text-muted-foreground">O</span>
+              <div className="flex-grow border-t border-muted"></div>
+            </div>
 
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-firstname">First Name</Label>
-                      <Input
-                        id="signup-firstname"
-                        name="signup-firstname"
-                        type="text"
-                        placeholder="John"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-lastname">Last Name</Label>
-                      <Input
-                        id="signup-lastname"
-                        name="signup-lastname"
-                        type="text"
-                        placeholder="Doe"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      name="signup-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      name="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Creating account...' : 'Create Account'}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isLoading}>
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Continuar con Google
+            </Button>
           </CardContent>
         </Card>
       </div>
