@@ -1,7 +1,7 @@
 // TechOS/src/pages/Login.tsx
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -67,6 +67,9 @@ const Login = () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/login`,
+        },
       });
       if (error) throw error;
     } catch (error: any) {
@@ -142,6 +145,15 @@ const Login = () => {
               <span className="mr-2 h-5 w-5">G</span>
               Continuar con Google
             </Button>
+
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                ¿No tienes cuenta?{' '}
+                <Link to="/register" className="text-primary hover:underline">
+                  Regístrate aquí
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

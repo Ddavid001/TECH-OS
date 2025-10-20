@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
 
   if (loading) {
     return (
@@ -19,6 +19,11 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If user exists but has no role, they need to complete registration
+  if (user && !userRole) {
+    return <Navigate to="/complete-registration" replace />;
   }
 
   return <>{children}</>;

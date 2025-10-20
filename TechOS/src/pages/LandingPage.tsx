@@ -39,15 +39,16 @@ const LandingPage = () => {
             onClick={() => navigate('/login')}
             className="text-lg"
           >
-            Go to Portal / Sign In
+            Iniciar Sesión
           </Button>
           
           <Button
             size="lg"
             variant="outline"
+            onClick={() => navigate('/register')}
             className="border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
           >
-            Learn More
+            Registrarse
           </Button>
         </div>
       </div>

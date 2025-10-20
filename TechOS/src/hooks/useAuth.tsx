@@ -29,19 +29,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch user role if session exists
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
+          // Check if user has a profile, if not, they need to complete registration
+          try {
+            const { data: profile, error } = await db
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+
+            if (error && error.code === 'PGRST116') {
+              // User doesn't have a profile yet (new Google user)
+              setUserRole(null);
+              setLoading(false);
+              return;
+            }
+
+            if (error) throw error;
+            setUserRole(profile?.role || null);
+          } catch (error) {
+            console.error('Error fetching user role:', error);
+            setUserRole(null);
+          }
         } else {
           setUserRole(null);
-          setLoading(false);
         }
+        setLoading(false);
       }
     );
 

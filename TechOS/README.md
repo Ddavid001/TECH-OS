@@ -48,7 +48,7 @@ cp env.example .env.local
 ```
 
 Edita `.env.local` con tus credenciales de Supabase:
-```env
+        ```env
 VITE_SUPABASE_URL=tu_url_de_supabase
 VITE_SUPABASE_PUBLISHABLE_KEY=tu_clave_publica_de_supabase
 ```
@@ -56,13 +56,19 @@ VITE_SUPABASE_PUBLISHABLE_KEY=tu_clave_publica_de_supabase
 4. **Configurar Supabase**
    - Crea un nuevo proyecto en [Supabase](https://supabase.com)
    - Ejecuta las migraciones SQL desde `supabase/migrations/`
+   - Ejecuta el script de seed desde `supabase/seed.sql` para datos de ejemplo
    - Configura las políticas RLS (Row Level Security)
    - Habilita el bucket de almacenamiento para materiales
+   - **Configurar Google OAuth (opcional):**
+     - Ve a Authentication > Providers en tu dashboard de Supabase
+     - Habilita Google provider
+     - Configura OAuth credentials desde Google Cloud Console
+     - Agrega tu dominio a las URLs autorizadas
 
 5. **Ejecutar en desarrollo**
 ```bash
-npm run dev
-```
+    npm run dev
+    ```
 
 ## 🗄️ Base de Datos
 

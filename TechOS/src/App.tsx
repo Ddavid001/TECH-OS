@@ -9,6 +9,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
 const TeacherCourseDetail = lazy(() => import("./pages/TeacherCourseDetail"));
@@ -32,6 +34,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/complete-registration" element={<CompleteRegistration />} />
               <Route
                 path="/admin/dashboard"
                 element={
