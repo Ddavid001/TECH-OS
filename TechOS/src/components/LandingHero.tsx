@@ -12,7 +12,7 @@ const LandingHero = () => {
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-students-in-a-university-classroom-4351-large.mp4"
+          src="/Educational_Campus_Montage_Video_Generation.mp4"
           type="video/mp4"
         />
       </video>
