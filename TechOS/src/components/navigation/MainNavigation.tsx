@@ -66,33 +66,36 @@ export const MainNavigation: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700" role="navigation" aria-label="Navegación principal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <GraduationCap className="h-8 w-8 text-primary dark:text-blue-400" />
+            <Link to="/" className="flex items-center space-x-2" aria-label="TechOS - Ir al inicio">
+              <GraduationCap className="h-8 w-8 text-primary dark:text-blue-400" aria-hidden="true" />
               <span className="text-xl font-bold text-gray-900 dark:text-white">TechOS</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-8" role="menubar">
             {navigationItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   isActive(item.href)
                     ? 'bg-primary text-primary-foreground dark:bg-blue-600 dark:text-white'
                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
+                role="menuitem"
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                aria-label={item.label}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className="h-4 w-4" aria-hidden="true" />
                 <span>{item.label}</span>
                 {item.badge && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs" aria-label={`${item.badge} - Nuevo`}>
                     {item.badge}
                   </Badge>
                 )}
@@ -101,19 +104,19 @@ export const MainNavigation: React.FC = () => {
           </div>
 
           {/* User Menu */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4" role="menubar" aria-label="Menú de usuario">
             {/* Language Switcher */}
             <LanguageSwitcher />
             
             {user ? (
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-500" />
+                <div className="flex items-center space-x-2" aria-label={`Usuario: ${user.email}`}>
+                  <User className="h-4 w-4 text-gray-500" aria-hidden="true" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
                     {user.email}
                   </span>
                   {userRole && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs" aria-label={`Rol: ${userRole === 'admin' ? 'Admin' : userRole === 'teacher' ? 'Profesor' : userRole === 'student' ? 'Estudiante' : 'Representante'}`}>
                       {userRole === 'admin' ? 'Admin' :
                        userRole === 'teacher' ? 'Profesor' :
                        userRole === 'student' ? 'Estudiante' : 'Representante'}
@@ -124,19 +127,20 @@ export const MainNavigation: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  aria-label="Cerrar sesión"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
                   Cerrar Sesión
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Button asChild variant="ghost" size="sm" className="dark:text-gray-300 dark:hover:text-white">
-                  <Link to="/login">{t('signIn')}</Link>
+                <Button asChild variant="ghost" size="sm" className="dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                  <Link to="/login" aria-label="Iniciar sesión">{t('signIn')}</Link>
                 </Button>
-                <Button asChild size="sm" className="dark:bg-blue-600 dark:hover:bg-blue-700">
-                  <Link to="/register">{t('register')}</Link>
+                <Button asChild size="sm" className="dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                  <Link to="/register" aria-label="Registrarse">{t('register')}</Link>
                 </Button>
               </div>
             )}
@@ -148,11 +152,15 @@ export const MainNavigation: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {isMobileMenuOpen ? (
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
               ) : (
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5" aria-hidden="true" />
               )}
             </Button>
           </div>
@@ -160,23 +168,31 @@ export const MainNavigation: React.FC = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t bg-white dark:bg-gray-800 dark:border-gray-700">
+          <div 
+            id="mobile-menu"
+            className="md:hidden border-t bg-white dark:bg-gray-800 dark:border-gray-700"
+            role="menu"
+            aria-label="Menú de navegación móvil"
+          >
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                     isActive(item.href)
                       ? 'bg-primary text-primary-foreground dark:bg-blue-600 dark:text-white'
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
+                  role="menuitem"
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  aria-label={item.label}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5" aria-hidden="true" />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs" aria-label={`${item.badge} - Nuevo`}>
                       {item.badge}
                     </Badge>
                   )}
@@ -206,19 +222,20 @@ export const MainNavigation: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={handleSignOut}
-                    className="w-full justify-start text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                    className="w-full justify-start text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label="Cerrar sesión"
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
                     Cerrar Sesión
                   </Button>
                 </div>
               ) : (
                 <div className="border-t pt-3 mt-3 space-y-2">
-                  <Button asChild variant="ghost" size="sm" className="w-full justify-start dark:text-gray-300 dark:hover:text-white">
-                    <Link to="/login">{t('signIn')}</Link>
+                  <Button asChild variant="ghost" size="sm" className="w-full justify-start dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                    <Link to="/login" aria-label="Iniciar sesión">{t('signIn')}</Link>
                   </Button>
-                  <Button asChild size="sm" className="w-full dark:bg-blue-600 dark:hover:bg-blue-700">
-                    <Link to="/register">{t('register')}</Link>
+                  <Button asChild size="sm" className="w-full dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                    <Link to="/register" aria-label="Registrarse">{t('register')}</Link>
                   </Button>
                 </div>
               )}

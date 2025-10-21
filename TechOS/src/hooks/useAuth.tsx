@@ -27,9 +27,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Configurando listener de autenticación...'); // TODO: Remover en producción
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email); // TODO: Remover en producción
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -45,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (error && error.code === 'PGRST116') {
               // User doesn't have a profile yet (new Google user)
+              console.log('Usuario sin perfil, redirigiendo a completar registro'); // TODO: Remover en producción
               setUserRole(null);
               setLoading(false);
               // Only redirect if not already on complete registration page
@@ -54,7 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               return;
             }
 
-            if (error) throw error;
+            if (error) {
+              console.error('Error fetching user role:', error);
+              throw error;
+            }
+            
+            console.log('Rol de usuario obtenido:', profile?.role); // TODO: Remover en producción
             setUserRole(profile?.role || null);
           } catch (error) {
             console.error('Error fetching user role:', error);
@@ -69,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Sesión existente:', session?.user?.email); // TODO: Remover en producción
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -79,18 +90,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Limpiando listener de autenticación'); // TODO: Remover en producción
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Obteniendo rol para usuario:', userId); // TODO: Remover en producción
+      
       const { data, error } = await db
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error obteniendo rol de usuario:', error);
+        throw error;
+      }
+      
+      console.log('Rol obtenido:', data?.role); // TODO: Remover en producción
       setUserRole(data?.role || null);
     } catch (error) {
       console.error('Error fetching user role:', error);
@@ -101,10 +122,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setUserRole(null);
+    try {
+      console.log('Cerrando sesión...'); // TODO: Remover en producción
+      
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error al cerrar sesión:', error);
+        throw error;
+      }
+      
+      console.log('Sesión cerrada exitosamente'); // TODO: Remover en producción
+      
+      setUser(null);
+      setSession(null);
+      setUserRole(null);
+    } catch (error) {
+      console.error('Error en signOut:', error);
+      // Aún así, limpiar el estado local
+      setUser(null);
+      setSession(null);
+      setUserRole(null);
+    }
   };
 
   return (

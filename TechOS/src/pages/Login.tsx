@@ -49,21 +49,43 @@ const Login = () => {
     const password = formData.get('login-password') as string;
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Intentando iniciar sesión con:', email); // TODO: Remover en producción
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error de autenticación:', error);
+        throw error;
+      }
+
+      console.log('Sesión iniciada exitosamente:', data); // TODO: Remover en producción
 
       toast({
         title: 'Éxito',
         description: 'Has iniciado sesión correctamente.',
       });
     } catch (error: any) {
+      console.error('Error completo en login:', error);
+      
+      // Manejo específico de errores comunes
+      let errorMessage = 'Error al intentar iniciar sesión';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Por favor confirma tu email antes de iniciar sesión.';
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Demasiados intentos. Espera un momento antes de intentar nuevamente.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
-        title: 'Fallo de inicio de sesión',
-        description: error.message || 'Email o contraseña inválidos.',
+        title: 'Error de inicio de sesión',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -74,17 +96,37 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log('Intentando login con Google...'); // TODO: Remover en producción
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/login`,
         },
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error en OAuth de Google:', error);
+        throw error;
+      }
+      
+      console.log('OAuth iniciado exitosamente:', data); // TODO: Remover en producción
     } catch (error: any) {
+      console.error('Error completo en Google login:', error);
+      
+      let errorMessage = 'No se pudo iniciar sesión con Google';
+      
+      if (error.message?.includes('popup_blocked')) {
+        errorMessage = 'El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio.';
+      } else if (error.message?.includes('access_denied')) {
+        errorMessage = 'Acceso denegado. Intenta nuevamente.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'Error de Google',
-        description: error.message || 'No se pudo iniciar sesión con Google.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
