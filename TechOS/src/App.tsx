@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Footer } from "@/components/Footer";
@@ -13,6 +13,8 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 const MapPage = lazy(() => import("./pages/MapPage"));
+const CaracasMapPage = lazy(() => import("./pages/CaracasMapPage"));
+const JobOffersPage = lazy(() => import("./pages/JobOffersPage"));
 const ApplicationsPortal = lazy(() => import("./pages/ApplicationsPortal"));
 const TeacherApplication = lazy(() => import("./pages/TeacherApplication"));
 const InstitutionApplication = lazy(() => import("./pages/InstitutionApplication"));
@@ -25,6 +27,7 @@ const RepresentativeDashboard = lazy(
 );
 const ProfilePage = lazy(() => import("./pages/Profile"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
+const TestImage = lazy(() => import("./pages/TestImage"));
 
 const queryClient = new QueryClient();
 
@@ -34,7 +37,6 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
@@ -43,6 +45,9 @@ const App = () => (
                 <Route path="/register" element={<Register />} />
                 <Route path="/complete-registration" element={<CompleteRegistration />} />
                 <Route path="/map" element={<MapPage />} />
+                <Route path="/caracas-map" element={<CaracasMapPage />} />
+                <Route path="/job-offers" element={<JobOffersPage />} />
+                <Route path="/test-image" element={<TestImage />} />
                 <Route path="/applications" element={<ApplicationsPortal />} />
                 <Route path="/applications/teacher" element={<TeacherApplication />} />
                 <Route path="/applications/institution" element={<InstitutionApplication />} />
@@ -100,7 +105,6 @@ const App = () => (
             </Suspense>
             <Footer />
           </div>
-        </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

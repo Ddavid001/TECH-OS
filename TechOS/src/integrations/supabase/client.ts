@@ -16,7 +16,7 @@ if (!SUPABASE_ANON_KEY) {
   throw new Error('VITE_SUPABASE_ANON_KEY is required');
 }
 
-console.log('Configurando Supabase client con URL:', SUPABASE_URL); // TODO: Remover en producción
+// Configurando Supabase client
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

@@ -40,14 +40,14 @@ export const MainNavigation: React.FC = () => {
   // Navigation items with translations
   const navigationItems: NavigationItem[] = [
     {
-      label: 'Inicio',
-      href: '/',
-      icon: Home,
+      label: 'Mapa de Caracas',
+      href: '/caracas-map',
+      icon: MapPin,
     },
     {
-      label: t('viewMap'),
-      href: '/map',
-      icon: MapPin,
+      label: 'Ofertas Laborales',
+      href: '/job-offers',
+      icon: Building,
     },
     {
       label: t('applications'),
@@ -147,22 +147,21 @@ export const MainNavigation: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
+          <div className="md:hidden flex items-center">
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
+              aria-label="Abrir menú principal"
             >
+              <span className="sr-only">Abrir menú principal</span>
               {isMobileMenuOpen ? (
-                <X className="h-5 w-5" aria-hidden="true" />
+                <X className="block h-6 w-6" aria-hidden="true" />
               ) : (
-                <Menu className="h-5 w-5" aria-hidden="true" />
+                <Menu className="block h-6 w-6" aria-hidden="true" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
 

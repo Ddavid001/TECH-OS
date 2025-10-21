@@ -49,8 +49,6 @@ const Login = () => {
     const password = formData.get('login-password') as string;
 
     try {
-      console.log('Intentando iniciar sesión con:', email); // TODO: Remover en producción
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -60,8 +58,6 @@ const Login = () => {
         console.error('Error de autenticación:', error);
         throw error;
       }
-
-      console.log('Sesión iniciada exitosamente:', data); // TODO: Remover en producción
 
       toast({
         title: 'Éxito',
@@ -94,23 +90,17 @@ const Login = () => {
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
     try {
-      console.log('Intentando login con Google...'); // TODO: Remover en producción
+      setIsLoading(true);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
-      if (error) {
-        console.error('Error en OAuth de Google:', error);
-        throw error;
-      }
-      
-      console.log('OAuth iniciado exitosamente:', data); // TODO: Remover en producción
+      if (error) throw error;
     } catch (error: any) {
       console.error('Error completo en Google login:', error);
       

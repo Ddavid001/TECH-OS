@@ -50,18 +50,16 @@
 ### Inglés (en/translation.json)
 ```json
 {
-  "heroTitle1": "Optimize Attendance.",
-  "heroTitle2": "Ensure Continuity.",
-  "heroTitle3": "Elevate Education."
+  "heroTitle1": "Tech OS",
+ 
 }
 ```
 
 ### Español (es/translation.json)
 ```json
 {
-  "heroTitle1": "Optimiza la Asistencia.",
-  "heroTitle2": "Garantiza la Continuidad.",
-  "heroTitle3": "Eleva la Educación."
+  "heroTitle1": "Tech OS",
+  
 }
 ```
 
@@ -121,3 +119,4 @@ Los siguientes console.log deben ser removidos antes del despliegue en producci�
 3. **Error boundaries**: Añadir error boundaries para manejo de errores de React
 4. **Performance**: Implementar lazy loading para componentes pesados
 5. **Analytics**: Añadir tracking de eventos de autenticación para debugging
+
