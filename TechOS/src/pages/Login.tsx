@@ -1,7 +1,7 @@
 // TechOS/src/pages/Login.tsx
 
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -9,14 +9,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, CheckCircle } from 'lucide-react';
 // import { FcGoogle } from 'react-icons/fc'; // Icono de Google
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, userRole, loading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Mostrar mensaje de confirmación si viene del registro
+    if (location.state?.message) {
+      setConfirmationMessage(location.state.message);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (user) {
@@ -109,6 +118,14 @@ const Login = () => {
             <CardDescription>Inicia sesión en tu cuenta</CardDescription>
           </CardHeader>
           <CardContent>
+            {confirmationMessage && (
+              <div className="mb-4 rounded-lg bg-green-50 p-4 border border-green-200">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  <p className="text-sm text-green-800">{confirmationMessage}</p>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>

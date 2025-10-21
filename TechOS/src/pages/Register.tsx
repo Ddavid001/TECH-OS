@@ -113,10 +113,15 @@ const Register = () => {
 
       toast({
         title: 'Éxito',
-        description: 'Cuenta creada correctamente. Por favor, inicia sesión.',
+        description: 'Cuenta creada correctamente. Se ha enviado un correo de confirmación a tu email.',
       });
 
-      navigate('/login');
+      // Redirigir a una página de confirmación o mostrar mensaje
+      navigate('/login', { 
+        state: { 
+          message: 'Por favor, revisa tu correo y haz clic en el enlace de confirmación para activar tu cuenta.' 
+        } 
+      });
     } catch (error: any) {
       toast({
         title: 'Error al registrar',
@@ -134,7 +139,7 @@ const Register = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/complete-registration`,
         },
       });
       if (error) throw error;

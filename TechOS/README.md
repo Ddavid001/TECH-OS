@@ -1,183 +1,262 @@
-# TechOS - Academic Continuity Platform
+# TechOS - Plataforma Educativa
 
-Una plataforma completa para la gestión educativa que conecta profesores, estudiantes y representantes en tiempo real.
+Una plataforma integral para la gestión educativa que conecta profesores, estudiantes y representantes en tiempo real, con funcionalidades de mapa interactivo y portal de postulaciones.
 
-## 🚀 Características
+## 🚀 Características Principales
 
-- **Dashboard de Administrador**: Gestión completa de usuarios, cursos y estadísticas
-- **Dashboard de Profesor**: Gestión de cursos, materiales y asistencia
-- **Dashboard de Estudiante**: Visualización de horarios y cursos
-- **Dashboard de Representante**: Seguimiento de asistencia de estudiantes vinculados
-- **Autenticación segura** con Supabase
-- **Interfaz multilingüe** (Español/Inglés)
-- **Gestión de archivos** para materiales de clase
-- **Sistema de roles** con permisos granulares
+### Funcionalidades Core
+- **Autenticación Segura**: Sistema de login/registro con confirmación por email
+- **Gestión de Roles**: Admin, Profesor, Estudiante, Representante
+- **Dashboard Personalizado**: Interfaces específicas para cada tipo de usuario
+- **Gestión de Asistencia**: Control de asistencia en tiempo real
+- **Materiales de Clase**: Subida y gestión de materiales educativos
 
-## 🛠️ Tecnologías
+### Nuevas Funcionalidades
+- **Mapa Interactivo**: Visualización de instituciones educativas en Caracas
+- **Geolocalización**: Detección automática de ubicación del usuario
+- **Portal de Postulaciones**: Sistema para docentes e instituciones
+- **Gestión de Archivos**: Subida segura de documentos con Supabase Storage
 
-- **Frontend**: React 18, TypeScript, Vite
-- **UI**: Tailwind CSS, shadcn/ui, Radix UI
-- **Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **Routing**: React Router v6
-- **Estado**: React Query (TanStack Query)
-- **Formularios**: React Hook Form + Zod
-- **Internacionalización**: i18next
+## 🛠️ Tecnologías Utilizadas
 
-## 📋 Prerrequisitos
+### Frontend
+- **React 18** con TypeScript
+- **Vite** como bundler
+- **Tailwind CSS** para estilos
+- **shadcn/ui** para componentes
+- **React Router** para navegación
+- **React Hook Form** para formularios
+- **Zod** para validación
+- **Zustand** para manejo de estado
+- **React Leaflet** para mapas interactivos
 
+### Backend
+- **Supabase** como Backend-as-a-Service
+- **PostgreSQL** como base de datos
+- **Row Level Security (RLS)** para seguridad
+- **Supabase Storage** para archivos
+- **Edge Functions** para lógica de servidor
+
+### Herramientas de Desarrollo
+- **ESLint** para linting
+- **TypeScript** para tipado estático
+- **Vite** para desarrollo rápido
+
+## 📦 Instalación
+
+### Prerrequisitos
 - Node.js 18+ 
-- npm o yarn
+- npm o bun
 - Cuenta de Supabase
 
-## 🚀 Instalación
+### Pasos de Instalación
 
 1. **Clonar el repositorio**
-```bash
-git clone <repository-url>
-cd TechOS
-```
+   ```bash
+   git clone <repository-url>
+   cd TechOS
+   ```
 
 2. **Instalar dependencias**
-```bash
-npm install
-```
+   ```bash
+   npm install
+   # o
+   bun install
+   ```
 
 3. **Configurar variables de entorno**
-```bash
-cp env.example .env.local
-```
-
-Edita `.env.local` con tus credenciales de Supabase:
-        ```env
-VITE_SUPABASE_URL=tu_url_de_supabase
-VITE_SUPABASE_PUBLISHABLE_KEY=tu_clave_publica_de_supabase
-```
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Editar `.env.local` con tus credenciales de Supabase:
+   ```env
+   VITE_SUPABASE_URL=tu_supabase_url
+   VITE_SUPABASE_PUBLISHABLE_KEY=tu_supabase_anon_key
+   ```
 
 4. **Configurar Supabase**
-   - Crea un nuevo proyecto en [Supabase](https://supabase.com)
-   - Ejecuta las migraciones SQL desde `supabase/migrations/`
-   - Ejecuta el script de seed desde `supabase/seed.sql` para datos de ejemplo
-   - Configura las políticas RLS (Row Level Security)
-   - Habilita el bucket de almacenamiento para materiales
-   - **Configurar Google OAuth (opcional):**
-     - Ve a Authentication > Providers en tu dashboard de Supabase
-     - Habilita Google provider
-     - Configura OAuth credentials desde Google Cloud Console
-     - Agrega tu dominio a las URLs autorizadas
+   - Crear un nuevo proyecto en Supabase
+   - Ejecutar las migraciones SQL desde `supabase/migrations/`
+   - Ejecutar el seed SQL desde `supabase/seed.sql`
+   - Configurar las políticas RLS
+   - Crear buckets de storage: `applications`, `class-materials`
 
-5. **Ejecutar en desarrollo**
+5. **Ejecutar migraciones de base de datos**
+   ```bash
+   # En el dashboard de Supabase, ejecutar los archivos SQL en orden:
+   # 1. 20251020044929_8adaad15-971c-468f-ab63-3c0fb265cc37.sql
+   # 2. 20251020045443_487a2287-2793-470a-a030-c1424ae9425e.sql
+   # 3. 20251020052830_09bbb889-89e9-42f9-b8ec-028afbb8fa3d.sql
+   # 4. 20251021000000_add_institution_coordinates.sql
+   ```
+
+## 🚀 Ejecución
+
+### Desarrollo
 ```bash
-    npm run dev
-    ```
-
-## 🗄️ Base de Datos
-
-El proyecto incluye las siguientes tablas principales:
-
-- **institutions**: Instituciones educativas
-- **profiles**: Perfiles de usuarios (extiende auth.users)
-- **courses**: Cursos
-- **enrollments**: Inscripciones de estudiantes
-- **schedules**: Horarios de clases
-- **attendance_records**: Registros de asistencia
-- **class_materials**: Materiales de clase
-- **teacher_absences**: Ausencias de profesores
-- **representative_links**: Vínculos representante-estudiante
-
-## 🔐 Autenticación y Roles
-
-El sistema maneja 4 tipos de usuarios:
-
-1. **Admin**: Gestión completa del sistema
-2. **Teacher**: Gestión de cursos y materiales
-3. **Student**: Acceso a horarios y cursos
-4. **Representative**: Seguimiento de estudiantes vinculados
-
-## 📱 Pantallas Principales
-
-### Dashboard de Administrador
-- Estadísticas generales
-- Gestión de usuarios (CRUD)
-- Vista de cursos y asistencia
-
-### Dashboard de Profesor
-- Clases del día
-- Gestión de cursos
-- Subida de materiales
-- Registro de asistencia
-
-### Dashboard de Estudiante
-- Horario del día
-- Cursos inscritos
-- Materiales disponibles
-
-### Dashboard de Representante
-- Seguimiento de asistencia
-- Estudiantes vinculados
-- Historial de registros
-
-## 🚀 Despliegue
-
-### Build de Producción
-```bash
-npm run build
+npm run dev
+# o
+bun dev
 ```
 
-### Variables de Entorno de Producción
-Asegúrate de configurar las variables de entorno en tu plataforma de despliegue:
-
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
-
-## 🔧 Scripts Disponibles
-
-- `npm run dev` - Servidor de desarrollo
-- `npm run build` - Build de producción
-- `npm run preview` - Preview del build
-- `npm run lint` - Linter
+### Producción
+```bash
+npm run build
+npm run preview
+```
 
 ## 📁 Estructura del Proyecto
 
 ```
-src/
-├── components/          # Componentes reutilizables
-│   ├── admin/          # Componentes específicos de admin
-│   ├── teacher/       # Componentes específicos de profesor
-│   └── ui/            # Componentes de UI base
-├── hooks/             # Custom hooks
-├── integrations/       # Integraciones externas (Supabase)
-├── lib/               # Utilidades y helpers
-├── pages/             # Páginas principales
-├── i18n/              # Configuración de internacionalización
-└── main.tsx           # Punto de entrada
+TechOS/
+├── src/
+│   ├── components/          # Componentes reutilizables
+│   │   ├── ui/             # Componentes base (shadcn/ui)
+│   │   ├── map/            # Componentes de mapa
+│   │   └── navigation/     # Componentes de navegación
+│   ├── pages/              # Páginas de la aplicación
+│   ├── hooks/              # Custom hooks
+│   ├── lib/                # Utilidades y helpers
+│   ├── stores/             # Estado global (Zustand)
+│   ├── types/              # Definiciones de tipos TypeScript
+│   └── integrations/       # Integraciones externas
+├── supabase/
+│   ├── functions/          # Edge Functions
+│   └── migrations/         # Migraciones de base de datos
+└── public/                 # Archivos estáticos
 ```
+
+## 🔐 Seguridad
+
+### Row Level Security (RLS)
+- Políticas implementadas para cada tabla
+- Acceso basado en roles de usuario
+- Validación de pertenencia a institución
+
+### Validación de Datos
+- Validación en frontend con Zod
+- Validación en backend con Edge Functions
+- Sanitización de inputs
+
+### Manejo de Archivos
+- Subida segura a Supabase Storage
+- Validación de tipos de archivo
+- Límites de tamaño
+
+## 🗺️ Funcionalidades del Mapa
+
+### Características
+- **Geolocalización**: Detección automática de ubicación
+- **Marcadores**: Instituciones educativas en Caracas
+- **Filtros**: Por tipo de institución
+- **Búsqueda**: Por nombre o dirección
+- **Responsive**: Adaptado para móviles
+
+### Datos de Instituciones
+- Universidad Central de Venezuela
+- Universidad Simón Bolívar
+- Universidad Católica Andrés Bello
+- Y más instituciones educativas de Caracas
+
+## 📝 Portal de Postulaciones
+
+### Para Docentes
+- Formulario de información personal
+- Subida de documentos (cédula, títulos)
+- Experiencia y formación académica
+- Seguimiento de estado de postulación
+
+### Para Instituciones
+- Registro de datos de la institución
+- Documentos legales (RIF, registros)
+- Información de contacto
+- Gestión de postulaciones
+
+## 🧪 Testing
+
+### Estructura de Pruebas
+```bash
+# Instalar dependencias de testing
+npm install --save-dev vitest @testing-library/react @testing-library/jest-dom
+
+# Ejecutar pruebas
+npm run test
+```
+
+### Ejemplos de Pruebas
+- Componentes de UI
+- Hooks personalizados
+- Funciones de utilidad
+- Validaciones de formularios
+
+## 📊 Monitoreo y Logs
+
+### Error Handling
+- Sistema centralizado de manejo de errores
+- Logging de errores para debugging
+- Notificaciones user-friendly
+
+### Performance
+- Lazy loading de componentes
+- Memoización de componentes pesados
+- Optimización de queries de Supabase
+
+## 🚀 Deployment
+
+### Vercel (Recomendado)
+1. Conectar repositorio a Vercel
+2. Configurar variables de entorno
+3. Deploy automático en cada push
+
+### Netlify
+1. Build command: `npm run build`
+2. Publish directory: `dist`
+3. Configurar variables de entorno
 
 ## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### Flujo de Trabajo
+1. Fork del repositorio
+2. Crear branch para feature: `git checkout -b feature/nueva-funcionalidad`
+3. Commit cambios: `git commit -m 'Agregar nueva funcionalidad'`
+4. Push al branch: `git push origin feature/nueva-funcionalidad`
+5. Crear Pull Request
+
+### Estándares de Código
+- Usar TypeScript estricto
+- Seguir convenciones de ESLint
+- Documentar funciones complejas
+- Escribir pruebas para nuevas funcionalidades
+
+## 📞 Soporte
+
+### Documentación
+- [Supabase Docs](https://supabase.com/docs)
+- [React Docs](https://react.dev)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+
+### Issues
+- Reportar bugs en GitHub Issues
+- Solicitar features en GitHub Discussions
+- Revisar documentación antes de preguntar
 
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 
-## 🆘 Soporte
+## 🎯 Roadmap
 
-Si tienes problemas o preguntas:
-
-1. Revisa la documentación de Supabase
-2. Verifica las variables de entorno
-3. Asegúrate de que las migraciones se ejecutaron correctamente
-4. Abre un issue en el repositorio
-
-## 🔄 Actualizaciones Futuras
-
-- [ ] Notificaciones en tiempo real
+### Próximas Funcionalidades
+- [ ] Notificaciones push
+- [ ] Chat en tiempo real
+- [ ] Analytics avanzados
+- [ ] API pública
+- [ ] Aplicación móvil
+- [ ] Integración con calendarios
 - [ ] Sistema de calificaciones
-- [ ] Chat entre usuarios
 - [ ] Reportes avanzados
-- [ ] App móvil
-- [ ] Integración con calendarios externos
+
+---
+
+**Desarrollado con ❤️ para la educación venezolana**

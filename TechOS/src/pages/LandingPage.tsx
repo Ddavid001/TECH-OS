@@ -1,54 +1,81 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import backgroundVideo from '@/assets/videos/background.mp4';
+import { MainNavigation } from '@/components/navigation/MainNavigation';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Asegurar que el video se reproduzca automáticamente
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.play().catch((error) => {
+        console.error("Error al intentar reproducir el video:", error);
+      });
+    }
+  }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Video Background */}
+    <div className="relative min-h-screen w-full overflow-hidden dark:bg-gray-900">
+      {/* Navigation */}
+      <MainNavigation />
+      
+      {/* Video Background - Fullscreen con zoom para evitar bordes negros */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover z-[-1] dark:brightness-60"
+        style={{
+          minHeight: '100vh',
+          minWidth: '100vw',
+          objectFit: 'cover'
+        }}
       >
         <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-set-of-plateaus-seen-from-the-heights-in-a-sunset-26070-large.mp4"
+          src={backgroundVideo}
           type="video/mp4"
         />
+        Tu navegador no soporta el tag de video.
       </video>
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/60 z-10" />
 
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
-        <h1 className="mb-6 text-5xl font-bold text-white md:text-6xl lg:text-7xl">
+      {/* Content - Asegurar que esté por encima del video */}
+      <div className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center">
+        <h1 className="mb-6 text-5xl font-bold text-white dark:text-gray-100 md:text-6xl lg:text-7xl">
           TECH OS 
         </h1>
         
-        <p className="mb-12 max-w-2xl text-lg text-white/90 md:text-xl">
-          Our platform ensures that learning never stops, connecting teachers, students, and representatives in real-time.
+        <p className="mb-12 max-w-2xl text-lg text-white/90 dark:text-gray-200 md:text-xl">
+          {t('heroDescription')}
         </p>
 
+        {/* Call-to-action buttons for main features */}
         <div className="flex flex-col gap-4 sm:flex-row">
           <Button
             size="lg"
-            onClick={() => navigate('/login')}
-            className="text-lg"
+            onClick={() => navigate('/map')}
+            className="text-lg bg-primary hover:bg-primary/90 dark:bg-blue-600 dark:hover:bg-blue-700"
           >
-            Iniciar Sesión
+            {t('viewMap')}
           </Button>
           
           <Button
             size="lg"
             variant="outline"
-            onClick={() => navigate('/register')}
-            className="border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+            onClick={() => navigate('/applications')}
+            className="border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 dark:border-gray-300 dark:bg-gray-800/50 dark:text-gray-100 dark:hover:bg-gray-700/50"
           >
-            Registrarse
+            {t('applications')}
           </Button>
         </div>
       </div>

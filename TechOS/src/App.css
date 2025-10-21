@@ -1,8 +1,8 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
@@ -39,4 +39,47 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Estilos para el video de fondo */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  transform: scale(1.05);
+}
+
+/* Estilos específicos para el video de fondo fullscreen */
+.landing-video-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  transform: scale(1.05);
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+/* Asegurar que el body y html ocupen toda la pantalla */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* Contenedor principal para el video de fondo */
+.landing-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }

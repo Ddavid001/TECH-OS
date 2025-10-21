@@ -54,5 +54,12 @@
   "admin": "Administrador",
   "teacher": "Profesor",
   "student": "Estudiante",
-  "representative": "Representante"
+  "representative": "Representante",
+  "register": "Registrarse",
+  "viewMap": "Ver Mapa",
+  "applications": "Postulaciones",
+  "heroDescription": "Nuestra plataforma garantiza que el aprendizaje nunca se detenga, conectando profesores, estudiantes y representantes en tiempo real.",
+  "footer": {
+    "copyright": "© 2025 TechOS. Todos los derechos reservados."
+  }
 }

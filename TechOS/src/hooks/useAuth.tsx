@@ -47,6 +47,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // User doesn't have a profile yet (new Google user)
               setUserRole(null);
               setLoading(false);
+              // Only redirect if not already on complete registration page
+              if (window.location.pathname !== '/complete-registration') {
+                window.location.href = '/complete-registration';
+              }
               return;
             }
 
