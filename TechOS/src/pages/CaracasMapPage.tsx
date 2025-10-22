@@ -11,6 +11,8 @@ import { useMapStore, useAppStore } from '@/stores/app-store';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Search, Filter, Briefcase, Building, GraduationCap, BookOpen } from 'lucide-react';
 import { caracasInstitutions, jobOffersByCategory } from '@/data/caracas-institutions';
+import { jobOffers } from '@/data/job-offers-data';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Caracas Map Page Component
@@ -18,6 +20,7 @@ import { caracasInstitutions, jobOffersByCategory } from '@/data/caracas-institu
 const CaracasMapPage: React.FC = () => {
   const { toast } = useToast();
   const { setMapMarkers, setMapCenter, setMapLoading } = useAppStore();
+  const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<InstitutionType | 'all'>('all');
@@ -184,22 +187,58 @@ const CaracasMapPage: React.FC = () => {
                         <Briefcase className="h-4 w-4 mr-2" />
                         Ofertas Laborales
                       </h3>
-                      {selectedMarker.jobOffers && selectedMarker.jobOffers.length > 0 ? (
-                        <ul className="space-y-2">
-                          {selectedMarker.jobOffers.map((job, index) => (
-                            <li key={index} className="text-sm">
-                              • {job}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-gray-500">
-                          No hay ofertas laborales disponibles
-                        </p>
-                      )}
+                      {(() => {
+                        const institutionOffers = jobOffers.filter(offer => offer.institution === selectedMarker.name);
+                        return institutionOffers.length > 0 ? (
+                          <div className="space-y-3">
+                            {institutionOffers.map((offer) => (
+                              <div 
+                                key={offer.id} 
+                                className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                                onClick={() => navigate(`/job-offers/${offer.id}`)}
+                              >
+                                <h4 className="font-medium text-sm mb-1">{offer.title}</h4>
+                                <div className="flex gap-2 flex-wrap">
+                                  <Badge variant="outline" className="text-xs">
+                                    {offer.contractType === 'full-time' ? 'Tiempo Completo' : 
+                                     offer.contractType === 'part-time' ? 'Medio Tiempo' : offer.contractType}
+                                  </Badge>
+                                  {offer.vacancies > 0 && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {offer.vacancies} vacante{offer.vacancies > 1 ? 's' : ''}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => navigate('/job-offers')}
+                              className="w-full mt-2"
+                            >
+                              Ver Todas las Ofertas
+                            </Button>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              No hay ofertas activas en este momento
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate('/job-offers')}
+                              className="w-full"
+                            >
+                              Explorar Todas las Ofertas
+                            </Button>
+                          </div>
+                        );
+                      })()}
                     </div>
                     
-                    <div className="pt-2">
+                    <div className="pt-2 border-t">
                       <Button
                         variant="outline"
                         size="sm"

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Briefcase, Building, MapPin, Calendar, Clock, Users } from 'lucide-react';
 import { jobOffersByCategory } from '@/data/caracas-institutions';
+import { useNavigate } from 'react-router-dom';
 
 interface JobOffersPanelProps {
   className?: string;
@@ -12,6 +13,7 @@ interface JobOffersPanelProps {
 
 const JobOffersPanel: React.FC<JobOffersPanelProps> = ({ className = '' }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(Object.keys(jobOffersByCategory)[0]);
+  const navigate = useNavigate();
 
   return (
     <Card className={className}>
@@ -78,8 +80,13 @@ const JobOffersPanel: React.FC<JobOffersPanelProps> = ({ className = '' }) => {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="bg-gray-50 p-3">
-                        <Button className="w-full">Ver detalles</Button>
+                      <CardFooter className="bg-gray-50 p-3 flex gap-2">
+                        <Button 
+                          className="flex-1"
+                          onClick={() => navigate('/job-offers')}
+                        >
+                          Ver todas las ofertas
+                        </Button>
                       </CardFooter>
                     </Card>
                   ))}

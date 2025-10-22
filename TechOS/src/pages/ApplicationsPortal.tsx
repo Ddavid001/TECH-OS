@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Building, FileText, ArrowLeft } from 'lucide-react';
+import { GraduationCap, Building, FileText, ArrowLeft, Users, Briefcase } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -34,7 +34,7 @@ const ApplicationsPortal: React.FC = () => {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver
               </Button>
-              <h1 className="text-xl font-semibold text-gray-900">Portal de Postulaciones</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Portal de Postulaciones y Ofertas</h1>
             </div>
           </div>
         </div>
@@ -48,6 +48,60 @@ const ApplicationsPortal: React.FC = () => {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Selecciona el tipo de postulación que mejor se adapte a tu perfil y necesidades.
           </p>
+        </div>
+
+        {/* Browse Section */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            Explora Oportunidades
+          </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card 
+              className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-primary"
+              onClick={() => navigate('/job-offers')}
+            >
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-3 w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                  <Briefcase className="h-7 w-7 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Ofertas Laborales</CardTitle>
+                <CardDescription>
+                  Explora vacantes en instituciones educativas
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center pb-6">
+                <Button variant="outline" className="w-full">
+                  Ver Ofertas
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="hover:shadow-lg transition-all cursor-pointer group border-2 hover:border-green-500"
+              onClick={() => navigate('/applications/browse')}
+            >
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-3 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <Users className="h-7 w-7 text-green-600" />
+                </div>
+                <CardTitle className="text-xl">Profesores Postulados</CardTitle>
+                <CardDescription>
+                  Descubre perfiles de profesores calificados
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center pb-6">
+                <Button variant="outline" className="w-full border-green-500 text-green-600 hover:bg-green-50">
+                  Ver Profesores
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="border-t pt-8 mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            Postúlate o Registra tu Institución
+          </h3>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
