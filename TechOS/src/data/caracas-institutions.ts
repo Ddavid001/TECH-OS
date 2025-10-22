@@ -1,4 +1,4 @@
-import { MapMarker } from '@/types';
+import { MapMarker, JobOffer, TeacherProfile, Profile, JobApplication } from '@/types';
 
 // Datos de instituciones educativas en Caracas
 export const caracasInstitutions: MapMarker[] = [

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -7,7 +8,8 @@ import { useMapStore, useAppStore } from '@/stores/app-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Navigation, Loader2 } from 'lucide-react';
+import { MapPin, Navigation, Loader2, Briefcase, TrendingUp } from 'lucide-react';
+import { getJobOffersByInstitution } from '@/data/mock-job-offers';
 
 // Fix for default markers in react-leaflet
 delete (Icon.Default.prototype as any)._getIconUrl;
@@ -61,6 +63,118 @@ const createCustomIcon = (type: string) => {
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
     shadowSize: [41, 41],
   });
+};
+
+/**
+ * Institution Popup Content Component
+ */
+const InstitutionPopupContent: React.FC<{
+  marker: MapMarker;
+  jobOffers: any[];
+  onMarkerClick: (marker: MapMarker) => void;
+}> = ({ marker, jobOffers, onMarkerClick }) => {
+  const navigate = useNavigate();
+
+  const formatJobType = (type: string) => {
+    const types = {
+      full_time: 'TC',
+      part_time: 'MT',
+      contract: 'Contrato',
+      temporary: 'Temporal'
+    };
+    return types[type as keyof typeof types] || type;
+  };
+
+  return (
+    <div className="min-w-[300px] max-w-[350px]">
+      <h3 className="font-bold text-lg mb-2 pr-4">{marker.name}</h3>
+      
+      <div className="flex items-center gap-2 mb-3">
+        <Badge variant="secondary">
+          {marker.type === 'school' ? 'Escuela' : 
+           marker.type === 'university' ? 'Universidad' : 'Instituto'}
+        </Badge>
+        {jobOffers.length > 0 && (
+          <Badge variant="default" className="flex items-center gap-1">
+            <Briefcase className="h-3 w-3" />
+            {jobOffers.length} {jobOffers.length === 1 ? 'oferta' : 'ofertas'}
+          </Badge>
+        )}
+      </div>
+      
+      {marker.address && (
+        <p className="text-sm text-gray-600 mb-3 flex items-start gap-2">
+          <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <span>{marker.address}</span>
+        </p>
+      )}
+
+      {/* Job Offers List */}
+      {jobOffers.length > 0 && (
+        <div className="mb-3 max-h-[200px] overflow-y-auto border-t pt-2">
+          <h4 className="text-sm font-semibold mb-2 flex items-center gap-1">
+            <TrendingUp className="h-4 w-4" />
+            Ofertas Disponibles
+          </h4>
+          <div className="space-y-2">
+            {jobOffers.slice(0, 3).map((offer) => (
+              <div 
+                key={offer.id}
+                className="p-2 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer transition-colors text-sm"
+                onClick={() => navigate(`/job-offers/${offer.id}`)}
+              >
+                <div className="font-medium line-clamp-1">{offer.title}</div>
+                <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
+                  <Badge variant="outline" className="text-xs px-1 py-0">
+                    {offer.subject_area}
+                  </Badge>
+                  <span>•</span>
+                  <span>{formatJobType(offer.job_type)}</span>
+                  <span>•</span>
+                  <span>{offer.vacancies} vacante{offer.vacancies !== 1 ? 's' : ''}</span>
+                </div>
+              </div>
+            ))}
+            {jobOffers.length > 3 && (
+              <p className="text-xs text-gray-500 text-center pt-1">
+                +{jobOffers.length - 3} ofertas más
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        {jobOffers.length > 0 ? (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onMarkerClick(marker)}
+              className="flex-1"
+            >
+              Ver institución
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => navigate(`/job-offers?institution=${marker.id}`)}
+              className="flex-1"
+            >
+              Ver ofertas
+            </Button>
+          </>
+        ) : (
+          <Button
+            size="sm"
+            onClick={() => onMarkerClick(marker)}
+            className="w-full"
+          >
+            Ver detalles
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 };
 
 /**
@@ -182,36 +296,27 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         )}
         
         {/* Institution markers */}
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            position={[marker.latitude, marker.longitude]}
-            icon={createCustomIcon(marker.type)}
-            eventHandlers={{
-              click: () => handleMarkerClick(marker),
-            }}
-          >
-            <Popup>
-              <div className="min-w-[200px]">
-                <h3 className="font-semibold text-lg mb-2">{marker.name}</h3>
-                <Badge variant="secondary" className="mb-2">
-                  {marker.type === 'school' ? 'Escuela' : 
-                   marker.type === 'university' ? 'Universidad' : 'Instituto'}
-                </Badge>
-                {marker.address && (
-                  <p className="text-sm text-gray-600 mb-2">{marker.address}</p>
-                )}
-                <Button
-                  size="sm"
-                  onClick={() => handleMarkerClick(marker)}
-                  className="w-full"
-                >
-                  Ver detalles
-                </Button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {markers.map((marker) => {
+          const jobOffers = getJobOffersByInstitution(marker.id).filter(o => o.status === 'active');
+          return (
+            <Marker
+              key={marker.id}
+              position={[marker.latitude, marker.longitude]}
+              icon={createCustomIcon(marker.type)}
+              eventHandlers={{
+                click: () => handleMarkerClick(marker),
+              }}
+            >
+              <Popup maxWidth={350} className="custom-popup">
+                <InstitutionPopupContent 
+                  marker={marker} 
+                  jobOffers={jobOffers}
+                  onMarkerClick={handleMarkerClick}
+                />
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
       
       {/* Location controls */}

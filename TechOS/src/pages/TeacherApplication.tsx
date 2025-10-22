@@ -21,6 +21,17 @@ type TeacherApplicationForm = {
   phone?: string;
   experience?: string;
   education?: string;
+  yearsOfExperience: number;
+  specialties: string;
+  certifications?: string;
+  languages?: string;
+  educationLevel?: 'bachelors' | 'masters' | 'phd' | 'specialist';
+  bio?: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+  expectedSalary?: number;
+  availabilityDate?: string;
+  coverLetter?: string;
   documents: File[];
 };
 
@@ -276,12 +287,60 @@ const TeacherApplication: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="educationLevel">Nivel Educativo *</Label>
+                  <select
+                    id="educationLevel"
+                    {...register('educationLevel')}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="bachelors">Licenciatura</option>
+                    <option value="masters">Maestría</option>
+                    <option value="phd">Doctorado</option>
+                    <option value="specialist">Especialización</option>
+                  </select>
+                  {errors.educationLevel && (
+                    <p className="text-sm text-red-600">{errors.educationLevel.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="yearsOfExperience">Años de Experiencia *</Label>
+                  <Input
+                    id="yearsOfExperience"
+                    type="number"
+                    min="0"
+                    max="50"
+                    {...register('yearsOfExperience', { valueAsNumber: true })}
+                    placeholder="5"
+                  />
+                  {errors.yearsOfExperience && (
+                    <p className="text-sm text-red-600">{errors.yearsOfExperience.message}</p>
+                  )}
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="education">Formación Académica</Label>
+                <Label htmlFor="specialties">Especialidades / Áreas de Enseñanza *</Label>
+                <Input
+                  id="specialties"
+                  {...register('specialties')}
+                  placeholder="Ej: Matemáticas, Cálculo, Álgebra (separadas por coma)"
+                />
+                <p className="text-xs text-gray-500">Ingresa tus áreas de especialización separadas por comas</p>
+                {errors.specialties && (
+                  <p className="text-sm text-red-600">{errors.specialties.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="education">Formación Académica Detallada</Label>
                 <Textarea
                   id="education"
                   {...register('education')}
-                  placeholder="Describe tu formación académica, títulos, certificaciones..."
+                  placeholder="Describe tus títulos universitarios, instituciones donde estudiaste, años de graduación..."
                   rows={3}
                 />
                 {errors.education && (
@@ -290,16 +349,148 @@ const TeacherApplication: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="experience">Experiencia Docente</Label>
+                <Label htmlFor="certifications">Certificaciones Profesionales</Label>
+                <Textarea
+                  id="certifications"
+                  {...register('certifications')}
+                  placeholder="Lista tus certificaciones profesionales, cursos especializados, etc. (una por línea)"
+                  rows={3}
+                />
+                {errors.certifications && (
+                  <p className="text-sm text-red-600">{errors.certifications.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="experience">Experiencia Docente Detallada</Label>
                 <Textarea
                   id="experience"
                   {...register('experience')}
-                  placeholder="Describe tu experiencia como docente, materias que impartes, años de experiencia..."
-                  rows={3}
+                  placeholder="Describe tu experiencia como docente, instituciones donde has trabajado, materias impartidas, logros destacados..."
+                  rows={4}
                 />
                 {errors.experience && (
                   <p className="text-sm text-red-600">{errors.experience.message}</p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="languages">Idiomas</Label>
+                <Input
+                  id="languages"
+                  {...register('languages')}
+                  placeholder="Ej: Español (nativo), Inglés (avanzado), Francés (intermedio)"
+                />
+                <p className="text-xs text-gray-500">Lista los idiomas que dominas con su nivel</p>
+                {errors.languages && (
+                  <p className="text-sm text-red-600">{errors.languages.message}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* About Me */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Sobre Mí</CardTitle>
+              <CardDescription>
+                Cuéntanos sobre tu filosofía de enseñanza y motivaciones
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="bio">Biografía Profesional</Label>
+                <Textarea
+                  id="bio"
+                  {...register('bio')}
+                  placeholder="Escribe una breve descripción sobre ti, tu enfoque pedagógico, qué te apasiona de la enseñanza..."
+                  rows={5}
+                />
+                <p className="text-xs text-gray-500">Esta información ayudará a las instituciones a conocerte mejor</p>
+                {errors.bio && (
+                  <p className="text-sm text-red-600">{errors.bio.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="coverLetter">Carta de Presentación</Label>
+                <Textarea
+                  id="coverLetter"
+                  {...register('coverLetter')}
+                  placeholder="Explica por qué estás interesado en oportunidades de enseñanza y qué puedes aportar..."
+                  rows={4}
+                />
+                {errors.coverLetter && (
+                  <p className="text-sm text-red-600">{errors.coverLetter.message}</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Links & Additional Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enlaces y Preferencias</CardTitle>
+              <CardDescription>
+                Información adicional y enlaces profesionales
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="linkedinUrl">LinkedIn</Label>
+                  <Input
+                    id="linkedinUrl"
+                    type="url"
+                    {...register('linkedinUrl')}
+                    placeholder="https://linkedin.com/in/tu-perfil"
+                  />
+                  {errors.linkedinUrl && (
+                    <p className="text-sm text-red-600">{errors.linkedinUrl.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="portfolioUrl">Portfolio / Sitio Web</Label>
+                  <Input
+                    id="portfolioUrl"
+                    type="url"
+                    {...register('portfolioUrl')}
+                    placeholder="https://tu-portfolio.com"
+                  />
+                  {errors.portfolioUrl && (
+                    <p className="text-sm text-red-600">{errors.portfolioUrl.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expectedSalary">Salario Esperado (USD)</Label>
+                  <Input
+                    id="expectedSalary"
+                    type="number"
+                    min="0"
+                    step="100"
+                    {...register('expectedSalary', { valueAsNumber: true })}
+                    placeholder="3000"
+                  />
+                  {errors.expectedSalary && (
+                    <p className="text-sm text-red-600">{errors.expectedSalary.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="availabilityDate">Disponibilidad Desde</Label>
+                  <Input
+                    id="availabilityDate"
+                    type="date"
+                    {...register('availabilityDate')}
+                  />
+                  {errors.availabilityDate && (
+                    <p className="text-sm text-red-600">{errors.availabilityDate.message}</p>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
