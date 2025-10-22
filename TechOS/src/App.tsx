@@ -15,8 +15,11 @@ const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 const MapPage = lazy(() => import("./pages/MapPage"));
 const CaracasMapPage = lazy(() => import("./pages/CaracasMapPage"));
 const JobOffersPage = lazy(() => import("./pages/JobOffersPage"));
+const JobOfferDetail = lazy(() => import("./pages/JobOfferDetail"));
+const ApplicationsPage = lazy(() => import("./pages/ApplicationsPage"));
 const ApplicationsPortal = lazy(() => import("./pages/ApplicationsPortal"));
 const TeacherApplication = lazy(() => import("./pages/TeacherApplication"));
+const TeacherProfileDetail = lazy(() => import("./pages/TeacherProfileDetail"));
 const InstitutionApplication = lazy(() => import("./pages/InstitutionApplication"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
@@ -47,10 +50,13 @@ const App = () => (
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/caracas-map" element={<CaracasMapPage />} />
                 <Route path="/job-offers" element={<JobOffersPage />} />
-                <Route path="/test-image" element={<TestImage />} />
+                <Route path="/job-offers/:jobId" element={<JobOfferDetail />} />
                 <Route path="/applications" element={<ApplicationsPortal />} />
+                <Route path="/applications/browse" element={<ApplicationsPage />} />
                 <Route path="/applications/teacher" element={<TeacherApplication />} />
+                <Route path="/applications/teacher/:teacherId" element={<TeacherProfileDetail />} />
                 <Route path="/applications/institution" element={<InstitutionApplication />} />
+                <Route path="/test-image" element={<TestImage />} />
                 <Route
                   path="/admin/dashboard"
                   element={

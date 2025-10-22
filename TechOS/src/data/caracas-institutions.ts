@@ -94,26 +94,27 @@ export const caracasInstitutions: MapMarker[] = [
   }
 ];
 
-// Datos de ofertas laborales por categoría
+// Datos de ofertas laborales por categoría (versión simplificada)
+// Para ver ofertas completas, importar desde job-offers-data.ts
 export const jobOffersByCategory = {
   'Educación': [
-    { title: 'Profesor de Matemáticas', institution: 'Universidad Central de Venezuela', location: 'Caracas', type: 'Tiempo completo' },
-    { title: 'Profesor de Primaria', institution: 'Colegio San Ignacio', location: 'Caracas', type: 'Tiempo completo' },
-    { title: 'Profesor de Ciencias', institution: 'Colegio Los Arcos', location: 'Caracas', type: 'Medio tiempo' }
+    { title: 'Profesor de Matemáticas Avanzadas', institution: 'Universidad Central de Venezuela', location: 'Ciudad Universitaria, Caracas', type: 'Tiempo completo' },
+    { title: 'Profesor de Ingeniería Electrónica', institution: 'Universidad Simón Bolívar', location: 'Valle de Sartenejas, Caracas', type: 'Tiempo completo' },
+    { title: 'Profesor de Economía y Finanzas', institution: 'Universidad Metropolitana', location: 'Autopista Petare-Guarenas, Caracas', type: 'Medio tiempo' },
+    { title: 'Profesor de Primaria', institution: 'Colegio San Ignacio', location: 'Av. Las Palmas, Chacao, Caracas', type: 'Tiempo completo' },
+    { title: 'Profesor de Ciencias Naturales', institution: 'Colegio Los Arcos', location: 'Los Ruices, Caracas', type: 'Tiempo completo' },
+    { title: 'Profesor de Derecho Constitucional', institution: 'Universidad Católica Andrés Bello', location: 'Montalbán, Caracas', type: 'Medio tiempo' }
   ],
   'Administración': [
-    { title: 'Asistente Administrativo', institution: 'Universidad Central de Venezuela', location: 'Caracas', type: 'Tiempo completo' },
-    { title: 'Coordinador Académico', institution: 'Universidad Metropolitana', location: 'Caracas', type: 'Tiempo completo' },
-    { title: 'Asistente Contable', institution: 'Instituto Universitario de Tecnología de Administración Industrial', location: 'Caracas', type: 'Medio tiempo' }
+    { title: 'Coordinador de Laboratorio de Física', institution: 'Universidad Simón Bolívar', location: 'Valle de Sartenejas, Caracas', type: 'Tiempo completo' },
+    { title: 'Coordinador de Pasantías', institution: 'Instituto Universitario de Tecnología Industrial Rodolfo Loero Arismendi', location: 'Los Ruices, Caracas', type: 'Tiempo completo' },
+    { title: 'Psicólogo Escolar', institution: 'Colegio San Ignacio', location: 'Chacao, Caracas', type: 'Tiempo completo' }
   ],
   'Investigación': [
-    { title: 'Investigador en Ciencias Sociales', institution: 'Universidad Central de Venezuela', location: 'Caracas', type: 'Proyecto' },
-    { title: 'Asistente de Investigación', institution: 'Universidad Simón Bolívar', location: 'Caracas', type: 'Beca' },
-    { title: 'Investigador', institution: 'Universidad Católica Andrés Bello', location: 'Caracas', type: 'Tiempo completo' }
+    { title: 'Investigador en Ciencias Sociales', institution: 'Universidad Central de Venezuela', location: 'Ciudad Universitaria, Caracas', type: 'Tiempo completo' }
   ],
   'Tecnología': [
-    { title: 'Profesor de Tecnología', institution: 'Instituto Universitario de Tecnología Industrial Rodolfo Loero Arismendi', location: 'Caracas', type: 'Tiempo completo' },
-    { title: 'Asistente Técnico', institution: 'Instituto Universitario de Tecnología Industrial Rodolfo Loero Arismendi', location: 'Caracas', type: 'Medio tiempo' },
-    { title: 'Coordinador de Laboratorio', institution: 'Universidad Simón Bolívar', location: 'Caracas', type: 'Tiempo completo' }
+    { title: 'Profesor de Programación y Desarrollo Web', institution: 'Instituto Universitario de Tecnología Industrial Rodolfo Loero Arismendi', location: 'Los Ruices, Caracas', type: 'Medio tiempo' },
+    { title: 'Profesor de Diseño Gráfico Digital', institution: 'Instituto de Diseño de Caracas', location: 'Av. Libertador, Caracas', type: 'Medio tiempo' }
   ]
 };

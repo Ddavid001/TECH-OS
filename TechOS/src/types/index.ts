@@ -124,6 +124,77 @@ export interface MapMarker {
   longitude: number;
   type: InstitutionType;
   address?: string;
+  jobOffers?: string[];
+}
+
+// Job Offer types
+export interface JobOffer {
+  id: string;
+  title: string;
+  institution: string;
+  institutionType: InstitutionType;
+  location: string;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  benefits: string[];
+  salary?: string;
+  contractType: 'full-time' | 'part-time' | 'contract' | 'temporary';
+  category: string;
+  subject?: string;
+  vacancies: number;
+  postedDate: string;
+  deadline?: string;
+  contactEmail?: string;
+  isActive: boolean;
+}
+
+// Teacher Profile types
+export interface TeacherExperience {
+  institution: string;
+  position: string;
+  subject?: string;
+  startDate: string;
+  endDate?: string;
+  description: string;
+}
+
+export interface TeacherEducation {
+  degree: string;
+  institution: string;
+  field: string;
+  graduationYear: string;
+}
+
+export interface TeacherCertification {
+  name: string;
+  issuer: string;
+  issueDate: string;
+  expiryDate?: string;
+}
+
+export interface TeacherProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  photo?: string;
+  bio: string;
+  specialties: string[];
+  experience: TeacherExperience[];
+  education: TeacherEducation[];
+  certifications: TeacherCertification[];
+  skills: string[];
+  languages: string[];
+  yearsOfExperience: number;
+  cvUrl?: string;
+  portfolioUrl?: string;
+  linkedinUrl?: string;
+  availableFrom?: string;
+  preferredLocations: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 // Application types
@@ -135,6 +206,21 @@ export interface Application {
   documents: string[];
   created_at: string;
   updated_at: string;
+}
+
+export interface TeacherApplicationData {
+  jobOfferId?: string;
+  teacherProfile: TeacherProfile;
+  coverLetter: string;
+  availability: string;
+  expectedSalary?: string;
+  references: {
+    name: string;
+    position: string;
+    institution: string;
+    email: string;
+    phone: string;
+  }[];
 }
 
 // Error types
