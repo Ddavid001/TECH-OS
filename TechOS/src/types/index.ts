@@ -2,6 +2,10 @@
 export type UserRole = 'admin' | 'teacher' | 'student' | 'representative';
 export type InstitutionType = 'school' | 'university' | 'institute';
 export type AttendanceStatus = 'present' | 'absent';
+export type JobType = 'full_time' | 'part_time' | 'contract' | 'temporary';
+export type JobStatus = 'active' | 'closed' | 'draft';
+export type EducationLevel = 'bachelors' | 'masters' | 'phd' | 'specialist';
+export type ApplicationStatus = 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'accepted';
 
 // Database entity types
 export interface Institution {
@@ -132,9 +136,77 @@ export interface Application {
   user_id: string;
   type: 'teacher' | 'institution';
   status: 'pending' | 'approved' | 'rejected';
+  data?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    experience?: string;
+    education?: string;
+  };
   documents: string[];
   created_at: string;
   updated_at: string;
+}
+
+// Teacher Profile types
+export interface TeacherProfile {
+  id: string;
+  user_id: string;
+  specialties: string[];
+  education_level?: EducationLevel;
+  years_of_experience: number;
+  certifications: string[];
+  languages: string[];
+  bio?: string;
+  cv_url?: string;
+  portfolio_url?: string;
+  linkedin_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Job Offer types
+export interface JobOffer {
+  id: string;
+  institution_id: string;
+  title: string;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  subject_area: string;
+  job_type: JobType;
+  status: JobStatus;
+  salary_min?: number;
+  salary_max?: number;
+  location?: string;
+  benefits: string[];
+  vacancies: number;
+  application_deadline?: string;
+  start_date?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+  published_at?: string;
+  // Relations
+  institution?: Institution;
+}
+
+// Job Application types
+export interface JobApplication {
+  id: string;
+  job_offer_id: string;
+  teacher_id: string;
+  application_id?: string;
+  status: ApplicationStatus;
+  cover_letter?: string;
+  expected_salary?: number;
+  availability_date?: string;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  job_offer?: JobOffer;
+  teacher?: Profile & { teacher_profile?: TeacherProfile };
 }
 
 // Error types
