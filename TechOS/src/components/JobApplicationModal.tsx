@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { isRestEnabled, restCreateJobApplication } from '@/lib/rest-client';
 import { useAuth } from '@/hooks/useAuth';
 import { JobOffer } from '@/types';
 import { Loader2, Upload, FileText, CheckCircle2 } from 'lucide-react';
@@ -80,33 +80,17 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
     }
   };
 
-  const uploadResume = async (fileName: string): Promise<string | null> => {
-    if (!resumeFile) return null;
-
-    try {
-      const { data, error } = await supabase.storage
-        .from('applications')
-        .upload(`resumes/${fileName}`, resumeFile);
-
-      if (error) throw error;
-
-      const { data: publicUrl } = supabase.storage
-        .from('applications')
-        .getPublicUrl(`resumes/${fileName}`);
-
-      return publicUrl.publicUrl;
-    } catch (error) {
-      console.error('Error uploading resume:', error);
-      throw error;
-    }
+  const uploadResume = async (_fileName: string): Promise<string | null> => {
+    // Almacenamiento deshabilitado en modo local
+    return null;
   };
 
   const onSubmit = useCallback(
     async (data: ApplicationFormData) => {
-      if (!user || !jobOffer) {
+      if (!jobOffer) {
         toast({
           title: 'Error',
-          description: 'Usuario u oferta no válida',
+          description: 'Oferta no válida',
           variant: 'destructive',
         });
         return;
@@ -124,7 +108,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
 
         // Crear aplicación
         const applicationData = {
-          user_id: user.id,
+          user_id: user?.id || (localStorage.getItem('techos_local_user_id') || (() => { const id = (crypto?.randomUUID?.() || '00000000-0000-0000-0000-000000000000'); localStorage.setItem('techos_local_user_id', id); return id; })()),
           job_offer_id: jobOffer.id,
           status: 'submitted',
           email: data.email,
@@ -139,11 +123,7 @@ export const JobApplicationModal: React.FC<JobApplicationModalProps> = ({
           },
         };
 
-        const { error } = await supabase
-          .from('job_applications')
-          .insert([applicationData]);
-
-        if (error) throw error;
+        await restCreateJobApplication(applicationData);
 
         setIsSuccess(true);
         toast({

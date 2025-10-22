@@ -184,3 +184,4 @@ SQL para ejecutar:
 💡 TIP: Si ves errores, cópialos completos de la consola (F12) y repórtalos.
 
 
+

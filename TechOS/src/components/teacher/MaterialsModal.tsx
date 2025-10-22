@@ -10,8 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { db } from '@/lib/supabase-helper';
 import { FileText, Trash2, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -46,32 +44,11 @@ export const MaterialsModal = ({
 
   useEffect(() => {
     if (open) {
-      fetchMaterials();
+      setMaterials([]);
     }
   }, [open, scheduleId]);
 
-  const fetchMaterials = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await db
-        .from('class_materials')
-        .select('*')
-        .eq('schedule_id', scheduleId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMaterials(data || []);
-    } catch (error) {
-      console.error('Error fetching materials:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load materials',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchMaterials = async () => {};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -80,80 +57,11 @@ export const MaterialsModal = ({
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !user) return;
-
-    setUploading(true);
-    try {
-      // Upload file to storage
-      const filePath = `${scheduleId}/${Date.now()}_${selectedFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('class-materials')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      // Create database record
-      const { error: dbError } = await db
-        .from('class_materials')
-        .insert({
-          schedule_id: scheduleId,
-          file_name: selectedFile.name,
-          file_path: filePath,
-          uploaded_by: user.id,
-        });
-
-      if (dbError) throw dbError;
-
-      toast({
-        title: 'Success',
-        description: 'Material uploaded successfully',
-      });
-
-      setSelectedFile(null);
-      fetchMaterials();
-    } catch (error) {
-      console.error('Error uploading material:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to upload material',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(false);
-    }
+    toast({ title: 'Modo local', description: 'Subida de materiales no disponible en modo local' });
   };
 
-  const handleDelete = async (material: Material) => {
-    try {
-      // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('class-materials')
-        .remove([material.file_path]);
-
-      if (storageError) throw storageError;
-
-      // Delete from database
-      const { error: dbError } = await db
-        .from('class_materials')
-        .delete()
-        .eq('id', material.id);
-
-      if (dbError) throw dbError;
-
-      toast({
-        title: 'Success',
-        description: 'Material deleted successfully',
-      });
-
-      fetchMaterials();
-    } catch (error) {
-      console.error('Error deleting material:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete material',
-        variant: 'destructive',
-      });
-    }
+  const handleDelete = async (_material: Material) => {
+    toast({ title: 'Modo local', description: 'Eliminación no disponible en modo local' });
   };
 
   return (
@@ -197,7 +105,7 @@ export const MaterialsModal = ({
             ) : materials.length === 0 ? (
               <div className="text-center py-8 border rounded-lg">
                 <FileText className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">No materials uploaded yet</p>
+                <p className="text-sm text-muted-foreground">No disponible en modo local</p>
               </div>
             ) : (
               <div className="space-y-2">

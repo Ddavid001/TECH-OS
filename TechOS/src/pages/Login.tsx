@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,7 @@ import { GraduationCap, CheckCircle } from 'lucide-react';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, userRole, loading } = useAuth();
+  const { user, userRole, loading, signIn } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
@@ -49,16 +48,7 @@ const Login = () => {
     const password = formData.get('login-password') as string;
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error('Error de autenticación:', error);
-        throw error;
-      }
-
+      await signIn(email, password);
       toast({
         title: 'Éxito',
         description: 'Has iniciado sesión correctamente.',
@@ -92,15 +82,7 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      
-      if (error) throw error;
+      throw new Error('OAuth no disponible en modo local');
     } catch (error: any) {
       console.error('Error completo en Google login:', error);
       
@@ -134,16 +116,18 @@ const Login = () => {
 }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <GraduationCap className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Academic Continuity</h1>
-          <p className="text-muted-foreground">Platform for Education Management</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-12">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold mb-2 flex items-center">
+            <GraduationCap className="h-8 w-8 mr-3" />
+            Academic Continuity
+          </h1>
+          <p className="text-lg text-white/80">Platform for Education Management</p>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8 max-w-md">
         <Card>
           <CardHeader>
             <CardTitle>Bienvenido</CardTitle>

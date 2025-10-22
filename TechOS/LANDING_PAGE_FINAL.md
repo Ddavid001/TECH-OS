@@ -263,3 +263,4 @@ No necesitas crear manualmente ni ofertas ni postulaciones:
 *Versión: 3.0 - Landing Page Simplificada + Generación Automática*
 
 
+

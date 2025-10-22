@@ -151,3 +151,4 @@ La aplicación está completamente funcional y lista para desarrollo o producci�
 **Próximo paso:** Aplicar el script SQL y ejecutar `npm run dev`
 
 
+

@@ -55,3 +55,4 @@ ORDER BY type;
 SELECT * FROM public.institutions ORDER BY name;
 
 
+

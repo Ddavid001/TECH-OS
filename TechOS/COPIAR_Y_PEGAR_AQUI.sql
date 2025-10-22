@@ -43,3 +43,4 @@ ON CONFLICT DO NOTHING;
 SELECT type, COUNT(*) as total FROM public.institutions GROUP BY type;
 
 
+

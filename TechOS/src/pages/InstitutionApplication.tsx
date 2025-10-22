@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+ 
 import { Building, Upload, FileText, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useErrorHandler } from '@/lib/error-handler';
 import { InstitutionType } from '@/types';
@@ -57,87 +57,22 @@ const InstitutionApplication: React.FC = () => {
   /**
    * Handle file upload
    */
-  const handleFileUpload = useCallback(async (files: FileList) => {
-    if (!user) return;
-
-    try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-        const filePath = `institution-applications/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('applications')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        return filePath;
-      });
-
-      const uploadedPaths = await Promise.all(uploadPromises);
-      setUploadedFiles(prev => [...prev, ...uploadedPaths]);
-      
-      toast({
-        title: 'Archivos subidos',
-        description: `${files.length} archivo(s) subido(s) correctamente`,
-      });
-    } catch (error: any) {
-      const appError = handleError(error, 'FileUpload');
-      toast({
-        title: 'Error al subir archivos',
-        description: appError.message,
-        variant: 'destructive',
-      });
-    }
-  }, [user, toast, handleError]);
+  const handleFileUpload = useCallback(async (_files: FileList) => {
+    toast({ title: 'Modo local', description: 'Subida de archivos no disponible en modo local' });
+  }, [toast]);
 
   /**
    * Handle form submission
    */
-  const onSubmit = useCallback(async (data: InstitutionApplicationForm) => {
-    if (!user) return;
-
+  const onSubmit = useCallback(async (_data: InstitutionApplicationForm) => {
     setIsSubmitting(true);
-
     try {
-      const applicationData = {
-        user_id: user.id,
-        type: 'institution',
-        status: 'pending',
-        data: {
-          name: data.name,
-          type: data.type,
-          address: data.address,
-          contactName: data.contactName,
-          contactEmail: data.contactEmail,
-          contactPhone: data.contactPhone,
-        },
-        documents: uploadedFiles,
-      };
-
-      const { error } = await supabase
-        .from('applications')
-        .insert(applicationData);
-
-      if (error) throw error;
-
       setIsSubmitted(true);
-      toast({
-        title: 'Postulación enviada',
-        description: 'Tu postulación de institución ha sido enviada correctamente. Te contactaremos pronto.',
-      });
-    } catch (error: any) {
-      const appError = handleError(error, 'InstitutionApplication');
-      toast({
-        title: 'Error al enviar postulación',
-        description: appError.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Modo local', description: 'Postulación simulada en modo local.' });
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, uploadedFiles, toast, handleError]);
+  }, [toast]);
 
   if (!user) {
     navigate('/login');

@@ -131,3 +131,4 @@ Ejecuta SQL_COMPLETO_INSTITUCIONES_Y_OFERTAS.sql en Supabase → Refresca → ¡
 🎉 ¡DISFRUTA TU SISTEMA COMPLETO! 🎉
 
 
+

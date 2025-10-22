@@ -46,7 +46,7 @@ export const MainNavigation: React.FC = () => {
     },
     {
       label: 'Ofertas',
-      href: '/ofertas',
+      href: '/#ofertas',
       icon: Building,
     },
     {

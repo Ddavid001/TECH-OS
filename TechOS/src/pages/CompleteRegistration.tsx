@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap } from 'lucide-react';
-import { db } from '@/lib/supabase-helper';
 
 interface Institution {
   id: string;
@@ -29,73 +27,14 @@ const CompleteRegistration = () => {
     if (!loading && !user) {
       navigate('/login');
     }
-    fetchInstitutions();
   }, [user, loading, navigate]);
 
-  const fetchInstitutions = async () => {
-    try {
-      const { data, error } = await db
-        .from('institutions')
-        .select('id, name, type')
-        .order('name');
-
-      if (error) throw error;
-      setInstitutions(data || []);
-    } catch (error) {
-      console.error('Error fetching institutions:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las instituciones',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingInstitutions(false);
-    }
-  };
+  const fetchInstitutions = async () => {};
 
   const handleCompleteRegistration = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return;
-
-    setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
-    const role = formData.get('role') as string;
-    const institutionId = formData.get('institutionId') as string;
-
-    try {
-      // Create profile for the user
-      const { error } = await db
-        .from('profiles')
-        .insert({
-          id: user.id,
-          first_name: firstName,
-          last_name: lastName,
-          role: role,
-          institution_id: institutionId,
-          email: user.email,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Éxito',
-        description: 'Registro completado correctamente.',
-      });
-
-      // Refresh the page to update auth state
-      window.location.reload();
-    } catch (error: any) {
-      toast({
-        title: 'Error al completar registro',
-        description: error.message || 'No se pudo completar el registro',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    toast({ title: 'Modo local', description: 'No se requiere completar registro en modo local.' });
+    navigate('/');
   };
 
   if (loading) {
@@ -106,27 +45,25 @@ const CompleteRegistration = () => {
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) { return null; }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
-            <GraduationCap className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Academic Continuity</h1>
-          <p className="text-muted-foreground">Complete your registration</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-12">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl font-bold mb-2 flex items-center">
+            <GraduationCap className="h-8 w-8 mr-3" />
+            Academic Continuity
+          </h1>
+          <p className="text-lg text-white/80">Complete your registration</p>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8 max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle>Completar Registro</CardTitle>
-            <CardDescription>
-              Bienvenido {user.email}. Por favor completa tu información para continuar.
-            </CardDescription>
+            <CardTitle>Modo Local</CardTitle>
+            <CardDescription>El registro adicional no es necesario en modo local.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCompleteRegistration} className="space-y-4">

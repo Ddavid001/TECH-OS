@@ -138,3 +138,4 @@ Ahora que existe, tu aplicación puede conectarse a Supabase y:
 **Ahora espera a que el servidor inicie y abre el navegador!** 🚀
 
 
+

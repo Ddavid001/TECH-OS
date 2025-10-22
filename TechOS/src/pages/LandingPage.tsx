@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { ApplicantsModal } from '@/components/ApplicantsModal';
+import { OffersModal } from '@/components/OffersModal';
 
 const LandingPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showApplicants, setShowApplicants] = useState(false);
+  const [showOffers, setShowOffers] = useState(false);
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -22,9 +24,8 @@ const LandingPage = () => {
   // Manejar apertura de modales desde hash URL
   useEffect(() => {
     const hash = location.hash;
-    if (hash === '#postulaciones') {
-      setShowApplicants(true);
-    }
+    if (hash === '#postulaciones') setShowApplicants(true);
+    if (hash === '#ofertas') setShowOffers(true);
   }, [location.hash]);
 
   return (
@@ -81,6 +82,7 @@ const LandingPage = () => {
 
       {/* Modals */}
       <ApplicantsModal open={showApplicants} onOpenChange={setShowApplicants} />
+      <OffersModal open={showOffers} onOpenChange={setShowOffers} />
     </div>
   );
 };

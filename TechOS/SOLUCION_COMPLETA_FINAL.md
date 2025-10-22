@@ -203,3 +203,4 @@ TechOS/
 **Dime qué URL aparece en la terminal y si el error "Failed to fetch" desapareció!** 🚀
 
 
+

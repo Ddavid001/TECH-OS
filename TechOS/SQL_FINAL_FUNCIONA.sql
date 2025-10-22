@@ -49,3 +49,4 @@ SELECT type, COUNT(*) as total FROM public.institutions GROUP BY type ORDER BY t
 SELECT id, name, type, latitude, longitude FROM public.institutions ORDER BY name;
 
 
+

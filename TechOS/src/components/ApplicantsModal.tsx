@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +12,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User, AlertCircle, CheckCircle } from 'lucide-react';
+import { Dialog as UiDialog, DialogContent as UiDialogContent, DialogHeader as UiDialogHeader, DialogTitle as UiDialogTitle } from '@/components/ui/dialog';
 import { useTranslation } from 'react-i18next';
+import { LOCAL_TEACHER_PROFILES } from '@/data/local-applicants';
 
 interface TeacherProfile {
   id: string;
@@ -32,6 +33,7 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
   const [applicants, setApplicants] = useState<TeacherProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<any | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -43,18 +45,10 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
     try {
       setLoading(true);
       setError(null);
-      
-      const { data, error: fetchError } = await supabase
-        .from('profiles')
-        .select('id, full_name, email, role')
-        .eq('role', 'teacher')
-        .limit(20);
-
-      if (fetchError) throw fetchError;
-      setApplicants(data || []);
+      // Local mode: use static applicants
+      setApplicants(LOCAL_TEACHER_PROFILES);
     } catch (err: any) {
-      console.error('Error fetching applicants:', err);
-      setError(err.message || 'Error al cargar los perfiles');
+      setError('No se pudieron cargar los perfiles locales');
     } finally {
       setLoading(false);
     }
@@ -75,6 +69,7 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -115,7 +110,7 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
             <div className="flex flex-col items-center justify-center py-12">
               <User className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground text-center">
-                No hay profesores registrados aún
+                No hay perfiles disponibles
               </p>
             </div>
           )}
@@ -133,22 +128,21 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
                     <CardTitle className="text-sm font-semibold">
                       {applicant.full_name}
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {maskEmail(applicant.email)}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{maskEmail(applicant.email)}</p>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
-                    <Badge variant="secondary" className="w-full justify-center">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Perfil Verificado
-                    </Badge>
+                    <div className="flex flex-wrap gap-1 justify-center">
+                      {(LOCAL_TEACHER_PROFILES.find(p => p.id === applicant.id)?.expertise || []).slice(0,2).map((tag, i) => (
+                        <Badge key={i} variant="secondary">{tag}</Badge>
+                      ))}
+                    </div>
                     <Button 
                       variant="outline" 
                       size="sm" 
                       className="w-full"
-                      disabled
+                      onClick={() => setSelected(LOCAL_TEACHER_PROFILES.find(p => p.id === applicant.id))}
                     >
-                      Ver Perfil (Próximamente)
+                      Ver Perfil
                     </Button>
                   </CardContent>
                 </Card>
@@ -164,5 +158,28 @@ export const ApplicantsModal = ({ open, onOpenChange }: ApplicantsModalProps) =>
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Profile modal */}
+    <UiDialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+      <UiDialogContent>
+        <UiDialogHeader>
+          <UiDialogTitle>Perfil del Docente</UiDialogTitle>
+        </UiDialogHeader>
+        {selected && (
+          <div className="space-y-2 text-sm">
+            <div className="font-semibold text-base">{selected.full_name}</div>
+            <div className="text-muted-foreground">{selected.email} • {selected.phone}</div>
+            <div><span className="font-semibold">Ciudad: </span>{selected.city}</div>
+            <div><span className="font-semibold">Experiencia: </span>{selected.experience_years} años</div>
+            <div><span className="font-semibold">Educación: </span>{selected.education}</div>
+            <div><span className="font-semibold">Áreas: </span>{(selected.expertise || []).join(', ')}</div>
+            {selected.bio && (
+              <div className="pt-2 text-gray-700 dark:text-gray-300">{selected.bio}</div>
+            )}
+          </div>
+        )}
+      </UiDialogContent>
+    </UiDialog>
+    </>
   );
 };

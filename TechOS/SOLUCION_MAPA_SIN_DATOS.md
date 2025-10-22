@@ -286,3 +286,4 @@ Después de aplicar el SQL, deberías ver:
 3. Revisa que el `.env` tenga las credenciales correctas de Supabase
 
 
+

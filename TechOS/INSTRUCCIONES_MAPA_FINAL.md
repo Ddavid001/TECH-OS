@@ -355,3 +355,4 @@ Las instituciones cubren **18 estados de Venezuela:**
 **Próximo paso:** Aplicar SQL en Supabase y probar
 
 
+

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { isRestEnabled, restFetchUserApplications } from '@/lib/rest-client';
 import { useAuth } from '@/hooks/useAuth';
 import { JobApplicationSummary } from '@/types';
 import {
@@ -34,6 +34,56 @@ interface ApplicationDetail extends JobApplicationSummary {
   rejection_reason?: string;
 }
 
+const DEMO_APPLICATIONS: ApplicationDetail[] = [
+  {
+    id: 'demo-app-1',
+    user_id: 'demo-user',
+    first_name: 'María',
+    last_name: 'González',
+    user_email: 'maria@example.com',
+    position_title: 'Profesor de Matemáticas',
+    institution_name: 'UCV',
+    status: 'submitted',
+    submitted_at: new Date().toISOString(),
+    total_applications_for_offer: 10,
+    application_number: 3,
+    cover_letter: 'Tengo experiencia enseñando álgebra y cálculo a nivel medio superior.',
+    phone: '+58 412-000-0000',
+    email: 'maria@example.com',
+  },
+  {
+    id: 'demo-app-2',
+    user_id: 'demo-user',
+    first_name: 'Carlos',
+    last_name: 'Pérez',
+    user_email: 'carlos@example.com',
+    position_title: 'Profesor de Física',
+    institution_name: 'Colegio Aplicación Caracas',
+    status: 'reviewing',
+    submitted_at: new Date(Date.now() - 86400000).toISOString(),
+    total_applications_for_offer: 7,
+    application_number: 1,
+    phone: '+58 414-111-1111',
+    email: 'carlos@example.com',
+  },
+  {
+    id: 'demo-app-3',
+    user_id: 'demo-user',
+    first_name: 'Ana',
+    last_name: 'López',
+    user_email: 'ana@example.com',
+    position_title: 'Profesor de Programación',
+    institution_name: 'USB',
+    status: 'accepted',
+    submitted_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+    reviewed_at: new Date().toISOString(),
+    total_applications_for_offer: 15,
+    application_number: 5,
+    phone: '+58 424-222-2222',
+    email: 'ana@example.com',
+  },
+];
+
 const MyApplicationsPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,56 +91,39 @@ const MyApplicationsPage: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('all');
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
     if (user) {
-      loadApplications();
+      loadApplications(user.id);
+    } else if (isRestEnabled()) {
+      const localUserId = localStorage.getItem('local_user_id');
+      if (localUserId) {
+        loadApplications(localUserId);
+      } else {
+        setApplications([]);
+        setDemoMode(true);
+        setIsLoading(false);
+      }
     } else {
-      navigate('/login');
+      setApplications(DEMO_APPLICATIONS);
+      setDemoMode(true);
+      setIsLoading(false);
     }
   }, [user]);
 
-  const loadApplications = async () => {
-    if (!user) return;
-
+  const loadApplications = async (targetUserId: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('job_applications')
-        .select(
-          `
-          id,
-          user_id,
-          job_offer_id,
-          status,
-          submitted_at,
-          reviewed_at,
-          cover_letter,
-          resume_url,
-          phone,
-          email,
-          rejection_reason,
-          job_offers:job_offer_id (
-            position_title,
-            institution_name,
-            branch,
-            tentative_salary,
-            requirements
-          )
-        `
-        )
-        .eq('user_id', user.id)
-        .order('submitted_at', { ascending: false });
-
-      if (error) throw error;
+      const rows = await restFetchUserApplications(targetUserId);
 
       // Transform data to match our interface
-      const transformedData: ApplicationDetail[] = (data || []).map((app: any) => ({
+      const transformedData: ApplicationDetail[] = (rows || []).map((app: any) => ({
         id: app.id,
         user_id: app.user_id,
-        first_name: user.user_metadata?.full_name?.split(' ')[0] || '',
-        last_name: user.user_metadata?.full_name?.split(' ')[1] || '',
-        user_email: app.email || user.email || '',
+        first_name: user?.user_metadata?.full_name?.split(' ')[0] || '',
+        last_name: user?.user_metadata?.full_name?.split(' ')[1] || '',
+        user_email: app.email || user?.email || '',
         position_title: app.job_offers?.position_title || '',
         institution_name: app.job_offers?.institution_name || '',
         status: app.status,
@@ -105,14 +138,16 @@ const MyApplicationsPage: React.FC = () => {
         rejection_reason: app.rejection_reason,
       }));
 
-      setApplications(transformedData);
+      if (transformedData.length === 0) {
+        setDemoMode(true);
+        setApplications(DEMO_APPLICATIONS);
+      } else {
+        setApplications(transformedData);
+      }
     } catch (error: any) {
       console.error('Error loading applications:', error);
-      toast({
-        title: 'Error',
-        description: 'No pudimos cargar tus postulaciones',
-        variant: 'destructive',
-      });
+      setDemoMode(true);
+      setApplications(DEMO_APPLICATIONS);
     } finally {
       setIsLoading(false);
     }
@@ -232,6 +267,11 @@ const MyApplicationsPage: React.FC = () => {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
+        {demoMode && (
+          <div className="mb-6 rounded-md border border-dashed p-3 text-sm bg-yellow-50 border-yellow-300 text-yellow-800">
+            Modo demostración: mostrando postulaciones de ejemplo. Inicia sesión y configura Supabase para ver tus datos reales.
+          </div>
+        )}
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <Card>

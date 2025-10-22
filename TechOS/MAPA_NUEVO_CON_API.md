@@ -189,3 +189,4 @@ Navega a: `http://localhost:XXXX/map`
 🎉 **¡Todo listo! El mapa ahora funciona con geolocalización automática por API.**
 
 
+

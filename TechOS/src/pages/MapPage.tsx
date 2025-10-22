@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { isRestEnabled, restFetchInstitutions } from '@/lib/rest-client';
 import { MapPin, Search, Filter, X, Loader2, Building, GraduationCap, BookOpen, Navigation as NavigationIcon, MapPinned, Route, Globe, Briefcase } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -197,114 +197,42 @@ const MapPage: React.FC = () => {
   }, [toast, detectUserLocationByIP]);
 
   /**
-   * Load institutions from Supabase (with demo data fallback)
+   * Load institutions from REST (with demo data fallback)
    */
   const loadInstitutions = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Cargando instituciones desde Supabase...');
-      
-      const { data, error } = await supabase
-        .from('institutions')
-        .select('id, name, type, latitude, longitude')
-        .not('latitude', 'is', null)
-        .not('longitude', 'is', null)
-        .order('name');
-
-      if (error) {
-        console.error('⚠️ Error de Supabase (usando datos de demostración):', error);
-        // Use demo data if Supabase fails
-        loadDemoInstitutions();
-        return;
+      if (isRestEnabled()) {
+        const rows = await restFetchInstitutions();
+        const filtered = (rows || []).filter((r: any) => r.latitude != null && r.longitude != null);
+        if (filtered.length > 0) {
+          setInstitutions(filtered as Institution[]);
+          return;
+        }
       }
-
-      if (!data || data.length === 0) {
-        console.log('⚠️ No hay datos en Supabase, cargando datos de demostración');
-        loadDemoInstitutions();
-        return;
-      }
-
-      console.log(`✅ Instituciones cargadas desde Supabase: ${data.length}`);
-      setInstitutions(data);
-      
+      loadDemoInstitutions();
     } catch (error: any) {
       console.error('⚠️ Error loading institutions (usando datos de demostración):', error);
       loadDemoInstitutions();
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   /**
    * Load demo institutions (shown if Supabase is not configured)
    */
-  const loadDemoInstitutions = () => {
-    const demoData: Institution[] = [
-      {
-        id: 'demo-1',
-        name: 'Universidad Central de Venezuela (UCV)',
-        type: 'university',
-        latitude: 10.489722,
-        longitude: -66.889167,
-      },
-      {
-        id: 'demo-2',
-        name: 'Universidad Simón Bolívar (USB)',
-        type: 'university',
-        latitude: 10.408611,
-        longitude: -66.886111,
-      },
-      {
-        id: 'demo-3',
-        name: 'Universidad Católica Andrés Bello (UCAB)',
-        type: 'university',
-        latitude: 10.503056,
-        longitude: -66.936944,
-      },
-      {
-        id: 'demo-4',
-        name: 'Universidad Metropolitana',
-        type: 'university',
-        latitude: 10.497222,
-        longitude: -66.826389,
-      },
-      {
-        id: 'demo-5',
-        name: 'Universidad Santa María',
-        type: 'university',
-        latitude: 10.502778,
-        longitude: -66.876944,
-      },
-      {
-        id: 'demo-6',
-        name: 'Colegio Emil Friedman',
-        type: 'school',
-        latitude: 10.476667,
-        longitude: -66.869444,
-      },
-      {
-        id: 'demo-7',
-        name: 'Colegio San Ignacio de Loyola',
-        type: 'school',
-        latitude: 10.494722,
-        longitude: -66.865278,
-      },
-      {
-        id: 'demo-8',
-        name: 'IUPOLC',
-        type: 'institute',
-        latitude: 10.488056,
-        longitude: -66.877500,
-      },
-    ];
-    
-    console.log('📍 Cargando 8 instituciones de demostración de Caracas');
-    setInstitutions(demoData);
-    
-    toast({
-      title: '📍 Instituciones de demostración',
-      description: 'Mostrando 8 instituciones de Caracas',
-    });
+  const loadDemoInstitutions = async () => {
+    const { VENEZUELA_INSTITUTIONS } = await import('@/data/venezuela-institutions');
+    const mapped = VENEZUELA_INSTITUTIONS.map((i: any) => ({
+      id: i.id,
+      name: i.name,
+      type: i.type,
+      latitude: i.latitude,
+      longitude: i.longitude,
+    })) as Institution[];
+    setInstitutions(mapped);
+    toast({ title: '📍 Instituciones locales', description: `Mostrando ${mapped.length} ubicaciones en Venezuela` });
   };
 
   /**

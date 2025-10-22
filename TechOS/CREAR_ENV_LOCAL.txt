@@ -33,6 +33,11 @@ PASO 2: CREAR ARCHIVO .env.local
     VITE_SUPABASE_URL=https://XXXXX.supabase.co
     VITE_SUPABASE_ANON_KEY=eyXXXXXXXXXXXXXX...
 
+    # REST API LOCAL (PostgREST)
+    # Si levantas la base local, usa esta URL
+    # Ejemplo: http://localhost:3001
+    VITE_REST_API_URL=http://localhost:3001
+
 Donde:
 - VITE_SUPABASE_URL = Project URL (paso 1.1)
 - VITE_SUPABASE_ANON_KEY = Anon Public Key (paso 1.4)

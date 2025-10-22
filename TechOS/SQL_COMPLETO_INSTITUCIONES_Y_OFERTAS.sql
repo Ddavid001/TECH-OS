@@ -332,3 +332,4 @@ ORDER BY i.type;
 SELECT '¡SQL ejecutado correctamente! Verifica los resultados arriba.' as mensaje;
 
 
+

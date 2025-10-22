@@ -232,3 +232,4 @@ Mapa:     http://localhost:8083/map
 SOLO FALTA: Ejecutar SQL en Supabase y refrescar la página!
 
 
+

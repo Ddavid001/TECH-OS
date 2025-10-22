@@ -65,3 +65,4 @@ ON CONFLICT DO NOTHING;
 SELECT COUNT(*) as total_offers FROM public.job_offers;
 
 
+

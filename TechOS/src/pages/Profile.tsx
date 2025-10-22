@@ -6,8 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { db } from '@/lib/supabase-helper';
+ 
 import { useToast } from '@/hooks/use-toast';
 
 const Profile = () => {
@@ -24,28 +23,12 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      fetchProfile();
+      const full = user.user_metadata?.full_name || '';
+      const [first = '', last = ''] = full.split(' ');
+      setFirstName(first);
+      setLastName(last);
     }
   }, [user]);
-
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await db
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      setFirstName(data.first_name || '');
-      setLastName(data.last_name || '');
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,27 +36,9 @@ const Profile = () => {
 
     setLoadingProfile(true);
     try {
-      const { error } = await db
-        .from('profiles')
-        .update({
-          first_name: firstName,
-          last_name: lastName,
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Success',
-        description: 'Profile updated successfully',
-      });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile',
-        variant: 'destructive',
-      });
+      const fullName = `${firstName} ${lastName}`.trim();
+      localStorage.setItem('techos_local_user_name', fullName);
+      toast({ title: 'Success', description: 'Profile updated locally' });
     } finally {
       setLoadingProfile(false);
     }
@@ -102,44 +67,25 @@ const Profile = () => {
 
     setLoadingPassword(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Success',
-        description: 'Password updated successfully',
-      });
-
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error) {
-      console.error('Error updating password:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update password',
-        variant: 'destructive',
-      });
+      toast({ title: 'Modo local', description: 'Cambio de contraseña no disponible en modo local' });
     } finally {
       setLoadingPassword(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-2xl font-bold text-foreground">Profile / Perfil</h1>
+            <h1 className="text-4xl font-bold">Profile / Perfil</h1>
           </div>
+          <p className="text-white/80 mt-1">Actualiza tu información y contraseña</p>
         </div>
-      </header>
+      </div>
 
       <main className="container mx-auto p-6 max-w-2xl">
         <div className="space-y-6">
