@@ -1,0 +1,1 @@
+import{a as s,j as t}from"./index-BioLNpht.js";import{B as o}from"./button-CybwPT74.js";const i=()=>{const{i18n:n}=s(),a=()=>{const e=n.language==="en"?"es":"en";n.changeLanguage(e)};return t.jsx(o,{variant:"ghost",size:"sm",onClick:a,className:"font-semibold",children:n.language==="en"?"ES":"EN"})};export{i as L};
