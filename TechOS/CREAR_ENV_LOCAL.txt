@@ -1,0 +1,102 @@
+================================================================================
+📝 CREAR ARCHIVO .env.local - GUÍA VISUAL
+================================================================================
+
+⚠️ IMPORTANTE: Este archivo contiene tus credenciales. NO lo subas a Git.
+
+================================================================================
+PASO 1: OBTENER CREDENCIALES DE SUPABASE
+================================================================================
+
+1.1 Abre: https://app.supabase.com
+1.2 Selecciona tu proyecto TechOS
+1.3 Click en "Settings" (abajo izquierda)
+1.4 Click en "API" (en el menú)
+
+Verás:
+
+    Project URL:           https://XXXXX.supabase.co  ← COPIA ESTO
+    Anon Public Key:       eyXXXXXXXXXXXXXX...        ← COPIA ESTO
+
+================================================================================
+PASO 2: CREAR ARCHIVO .env.local
+================================================================================
+
+2.1 Abre tu editor de código (VSCode)
+2.2 En la carpeta TechOS (raíz)
+2.3 Click derecho → New File
+2.4 Nombre: .env.local
+
+2.5 Pega el siguiente contenido:
+
+    # SUPABASE CONFIGURATION
+    VITE_SUPABASE_URL=https://XXXXX.supabase.co
+    VITE_SUPABASE_ANON_KEY=eyXXXXXXXXXXXXXX...
+
+Donde:
+- VITE_SUPABASE_URL = Project URL (paso 1.1)
+- VITE_SUPABASE_ANON_KEY = Anon Public Key (paso 1.4)
+
+================================================================================
+EJEMPLO (NO USES ESTOS VALORES):
+================================================================================
+
+    VITE_SUPABASE_URL=https://bnaajokvfsasdfw.supabase.co
+    VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYWFqb2t2ZnNhc2RmdzEyMyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjk1ODAwMDAwLCJleHAiOjE3MTI0ODAwMDB9.xxxxx
+
+================================================================================
+PASO 3: GUARDAR Y REINICIAR
+================================================================================
+
+3.1 Guarda el archivo (Ctrl+S)
+3.2 En terminal: Detén el proyecto (Ctrl+C)
+3.3 Reinicia: npm run dev
+3.4 Abre: http://localhost:5173/ofertas
+
+¡Debería funcionar ahora! 🎉
+
+================================================================================
+VERIFICACIÓN:
+================================================================================
+
+Abre el navegador DevTools (F12) → Console
+
+Deberías ver:
+    ✅ "Cargando ofertas laborales desde Supabase..."
+    ✅ "Ofertas cargadas: 45"
+    ❌ NO deberías ver: "Error de Supabase" o "Failed to fetch"
+
+================================================================================
+ERRORES COMUNES:
+================================================================================
+
+PROBLEMA: "Failed to fetch"
+SOLUCIÓN:
+  • Verifica que copiaste correctamente las credenciales
+  • No agregues caracteres extra al principio/final
+  • Las URLs no deben tener espacios
+
+PROBLEMA: "Error: Error al cargar ofertas"
+SOLUCIÓN:
+  • Verifica que el SQL fue ejecutado en Supabase
+  • Ve a Table Editor y confirma que ves las 45 ofertas
+  • Guarda .env.local y reinicia (Ctrl+C, npm run dev)
+
+PROBLEMA: "VITE_SUPABASE_URL is required"
+SOLUCIÓN:
+  • El archivo .env.local no fue creado
+  • Sigue los pasos 2.1 a 2.4
+  • Asegúrate que está en la raíz (mismo nivel que package.json)
+
+================================================================================
+📞 RESUMEN RÁPIDO:
+================================================================================
+
+1. Copia credenciales de Supabase Settings → API
+2. Crea archivo .env.local en raíz del proyecto
+3. Pega: VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY
+4. Guarda (Ctrl+S)
+5. Reinicia proyecto (Ctrl+C, npm run dev)
+6. ¡LISTO! 🚀
+
+================================================================================

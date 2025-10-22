@@ -1,0 +1,205 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    🔍 DIAGNÓSTICO URGENTE                                ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+✅ SERVIDOR CORRIENDO EN:
+-------------------------
+http://localhost:8084/
+
+
+🎯 PASOS DE DIAGNÓSTICO INMEDIATO:
+----------------------------------
+
+1. ABRE EL NAVEGADOR EN:
+   http://localhost:8084/ofertas
+
+2. PRESIONA F12 PARA ABRIR CONSOLA
+
+3. VE A LA PESTAÑA "CONSOLE"
+
+4. REPORTA EXACTAMENTE QUÉ VES:
+
+   □ Pantalla en blanco (fondo blanco/negro)
+   □ Error 404 "Not Found"
+   □ Loading infinito
+   □ Error en consola (copiar el error completo)
+   □ Otra cosa (describe)
+
+
+📝 SI VES ERROR EN CONSOLA:
+---------------------------
+
+Busca líneas en ROJO que digan:
+- "Failed to fetch module"
+- "Cannot find module"
+- "Unexpected token"
+- "SyntaxError"
+- Cualquier otro error
+
+COPIA TODO EL ERROR COMPLETO Y REPÓRTALO
+
+
+🗺️ PRUEBA EL MAPA:
+------------------
+
+1. Ve a: http://localhost:8084/map
+
+2. ¿Ves el mapa con marcadores? SI / NO
+
+3. Si ves marcadores:
+   - Click en uno (ej. UCV)
+   - ¿Aparece un popup? SI / NO
+   - ¿El popup tiene botón "Ofertas Docentes"? SI / NO
+
+
+🔄 SI LA PÁGINA ESTÁ EN BLANCO:
+-------------------------------
+
+1. Presiona Ctrl+Shift+R (hard refresh)
+2. Espera 5 segundos
+3. ¿Sigue en blanco? SI / NO
+
+
+📊 SI VES "NO HAY OFERTAS":
+---------------------------
+
+Esto significa que la página FUNCIONA pero:
+- Falta ejecutar el SQL, O
+- No se puede conectar a Supabase
+
+Ve a consola (F12) y busca:
+- "🔄 Cargando ofertas laborales..."
+- "✅ Ofertas cargadas: 0"
+- O algún error de Supabase
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    POSIBLES ESCENARIOS:                                  ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+ESCENARIO A: PANTALLA BLANCA + ERROR EN CONSOLA
+------------------------------------------------
+→ Hay un error de JavaScript
+→ SOLUCIÓN: Copia el error completo y repórtalo
+
+
+ESCENARIO B: ERROR 404
+----------------------
+→ La ruta no está registrada
+→ SOLUCIÓN: Verificar App.tsx (ya está bien)
+→ Prueba con Ctrl+C y reinicia: npm run dev
+
+
+ESCENARIO C: PÁGINA CARGA PERO DICE "NO HAY OFERTAS"
+-----------------------------------------------------
+→ La página funciona correctamente
+→ Falta ejecutar SQL en Supabase
+→ SOLUCIÓN: Ve a paso 4 abajo
+
+
+ESCENARIO D: LOADING INFINITO
+------------------------------
+→ Supabase no responde
+→ SOLUCIÓN: Verificar .env y conexión
+
+
+ESCENARIO E: BOTÓN NO APARECE EN MAPA
+--------------------------------------
+→ Caché del navegador
+→ SOLUCIÓN: Ctrl+Shift+R en /map
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    INSTRUCCIONES PASO A PASO:                            ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+PASO 1: ABRIR NAVEGADOR
+------------------------
+URL: http://localhost:8084/ofertas
+
+
+PASO 2: ABRIR CONSOLA
+----------------------
+Presiona: F12
+Ve a: Tab "Console"
+
+
+PASO 3: VER QUÉ DICE LA CONSOLA
+--------------------------------
+Busca mensajes que empiecen con:
+- 🔄 (emoji de carga)
+- ✅ (emoji de check)
+- ❌ (emoji de error)
+- O cualquier línea en ROJO
+
+
+PASO 4: SI DICE "NO HAY OFERTAS"
+---------------------------------
+
+Significa que funciona! Solo falta el SQL.
+
+Ejecuta en Supabase:
+1. https://supabase.com/dashboard/project/jpqltnyuexzkzkdksifp
+2. SQL Editor
+3. Copia: SQL_JOB_OFFERS_CON_INSTITUCIONES.sql
+4. Run
+5. Refresca página
+
+
+PASO 5: SI HAY ERROR
+--------------------
+
+Copia EXACTAMENTE el error completo desde la consola.
+
+Ejemplo de lo que necesito ver:
+```
+Error: Cannot read property 'map' of undefined
+    at JobOffersPage.tsx:123:45
+    at ...
+```
+
+
+PASO 6: PRUEBA EL MAPA
+-----------------------
+
+http://localhost:8084/map
+
+1. ¿Se ve el mapa? SI / NO
+2. ¿Hay marcadores? SI / NO
+3. Click en marcador
+4. ¿Aparece popup? SI / NO
+5. ¿Popup tiene botón "Ofertas Docentes"? SI / NO
+6. Click en botón
+7. ¿Te lleva a /ofertas? SI / NO
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    LO QUE NECESITO QUE REPORTES:                         ║
+║                                                                          ║
+║  1. ¿Qué ves en http://localhost:8084/ofertas?                           ║
+║     (Describe exactamente: blanco, error, loading, etc.)                 ║
+║                                                                          ║
+║  2. ¿Hay errores en consola (F12)?                                       ║
+║     (Si/No, y si es Si, copia el error completo)                         ║
+║                                                                          ║
+║  3. ¿Qué ves en http://localhost:8084/map?                               ║
+║     (¿Ves el mapa? ¿Hay botón en popup?)                                 ║
+║                                                                          ║
+║  4. Si hiciste hard refresh (Ctrl+Shift+R), ¿cambió algo?                ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+💡 TIP: Toma screenshots si es más fácil y muéstralos.
+
+

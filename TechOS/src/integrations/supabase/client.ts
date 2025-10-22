@@ -7,16 +7,26 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Verificar que las variables de entorno estén configuradas
 if (!SUPABASE_URL) {
-  console.error('VITE_SUPABASE_URL no está configurada en las variables de entorno');
-  throw new Error('VITE_SUPABASE_URL is required');
+  console.error('❌ VITE_SUPABASE_URL no está configurada');
+  console.error('📝 Crea un archivo .env.local en la raíz del proyecto con:');
+  console.error('   VITE_SUPABASE_URL=https://tu-proyecto.supabase.co');
+  console.error('   VITE_SUPABASE_ANON_KEY=tu-clave-anonima');
+  throw new Error('VITE_SUPABASE_URL es requerida. Ver console para instrucciones.');
 }
 
 if (!SUPABASE_ANON_KEY) {
-  console.error('VITE_SUPABASE_ANON_KEY no está configurada en las variables de entorno');
-  throw new Error('VITE_SUPABASE_ANON_KEY is required');
+  console.error('❌ VITE_SUPABASE_ANON_KEY no está configurada');
+  console.error('📝 Crea un archivo .env.local en la raíz del proyecto con:');
+  console.error('   VITE_SUPABASE_URL=https://tu-proyecto.supabase.co');
+  console.error('   VITE_SUPABASE_ANON_KEY=tu-clave-anonima');
+  throw new Error('VITE_SUPABASE_ANON_KEY es requerida. Ver console para instrucciones.');
 }
 
-// Configurando Supabase client
+// Log de configuración (solo en desarrollo)
+if (import.meta.env.MODE === 'development') {
+  console.log('✅ Supabase configurado correctamente');
+  console.log(`   URL: ${SUPABASE_URL.substring(0, 30)}...`);
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

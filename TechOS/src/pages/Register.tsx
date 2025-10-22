@@ -8,22 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, ArrowLeft } from 'lucide-react';
-import { db } from '@/lib/supabase-helper';
-
-interface Institution {
-  id: string;
-  name: string;
-  type: string;
-}
+import { GraduationCap } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
   const { user, userRole, loading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [loadingInstitutions, setLoadingInstitutions] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -38,31 +29,6 @@ const Register = () => {
     }
   }, [user, userRole, navigate]);
 
-  useEffect(() => {
-    fetchInstitutions();
-  }, []);
-
-  const fetchInstitutions = async () => {
-    try {
-      const { data, error } = await db
-        .from('institutions')
-        .select('id, name, type')
-        .order('name');
-
-      if (error) throw error;
-      setInstitutions(data || []);
-    } catch (error) {
-      console.error('Error fetching institutions:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las instituciones',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingInstitutions(false);
-    }
-  };
-
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,7 +40,6 @@ const Register = () => {
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
     const role = formData.get('role') as string;
-    const institutionId = formData.get('institutionId') as string;
 
     if (password !== confirmPassword) {
       toast({
@@ -97,35 +62,47 @@ const Register = () => {
     }
 
     try {
-      // Crear usuario usando la función edge
-      const { data, error } = await supabase.functions.invoke('create-user', {
-        body: {
-          email,
-          password,
-          firstName,
-          lastName,
-          role,
-          institutionId,
+      // Registrar usuario con Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`,
+            role: role,
+          },
         },
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
       toast({
         title: 'Éxito',
         description: 'Cuenta creada correctamente. Se ha enviado un correo de confirmación a tu email.',
       });
 
-      // Redirigir a una página de confirmación o mostrar mensaje
+      // Redirigir a login con mensaje
       navigate('/login', { 
         state: { 
           message: 'Por favor, revisa tu correo y haz clic en el enlace de confirmación para activar tu cuenta.' 
         } 
       });
     } catch (error: any) {
+      console.error('Error en registro:', error);
+      
+      let errorMessage = 'No se pudo crear la cuenta';
+      
+      if (error.message?.includes('already registered')) {
+        errorMessage = 'Este email ya está registrado. Intenta iniciar sesión.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'Error al registrar',
-        description: error.message || 'No se pudo crear la cuenta',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -227,22 +204,6 @@ const Register = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="institutionId">Institución</Label>
-                <Select name="institutionId" required disabled={loadingInstitutions}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={loadingInstitutions ? "Cargando..." : "Selecciona tu institución"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {institutions.map((institution) => (
-                      <SelectItem key={institution.id} value={institution.id}>
-                        {institution.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
                 <Input
                   id="password"
@@ -264,11 +225,12 @@ const Register = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading || loadingInstitutions}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
               </Button>
             </form>
 
+            {/* Google OAuth deshabilitado - no configurado en Supabase
             <div className="my-4 flex items-center">
               <div className="flex-grow border-t border-muted"></div>
               <span className="mx-4 text-xs uppercase text-muted-foreground">O</span>
@@ -279,8 +241,9 @@ const Register = () => {
               <span className="mr-2 h-5 w-5">G</span>
               Continuar con Google
             </Button>
+            */}
 
-            <div className="mt-4 text-center">
+            <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 ¿Ya tienes cuenta?{' '}
                 <Link to="/login" className="text-primary hover:underline">

@@ -22,6 +22,7 @@ interface InteractiveMapProps {
   onMarkerClick?: (marker: MapMarker) => void;
   height?: string;
   className?: string;
+  userLocation?: {latitude: number, longitude: number} | null;
 }
 
 /**
@@ -71,10 +72,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   onMarkerClick,
   height = '500px',
   className = '',
+  userLocation: propUserLocation = null,
 }) => {
-  const { center, zoom, userLocation, isLoading } = useMapStore();
+  const { center, zoom, userLocation: storeUserLocation, isLoading } = useMapStore();
   const { setMapCenter, setUserLocation, setMapLoading } = useAppStore();
   const [locationError, setLocationError] = useState<string | null>(null);
+  
+  // Use prop location if provided, otherwise use store location
+  const userLocation = propUserLocation || storeUserLocation;
 
   /**
    * Request user's geolocation
@@ -122,31 +127,53 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [onMarkerClick]);
 
   /**
-   * Request location on component mount
+   * Auto-center map on markers if available
    */
   useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
+    if (markers.length > 0) {
+      // Calculate bounds to fit all markers
+      const latitudes = markers.map(m => m.latitude);
+      const longitudes = markers.map(m => m.longitude);
+      
+      const centerLat = (Math.max(...latitudes) + Math.min(...latitudes)) / 2;
+      const centerLng = (Math.max(...longitudes) + Math.min(...longitudes)) / 2;
+      
+      setMapCenter({ latitude: centerLat, longitude: centerLng });
+    }
+  }, [markers, setMapCenter]);
+
+  /**
+   * Request location on component mount (optional - only if user allows)
+   */
+  useEffect(() => {
+    // Request location after a short delay to not block rendering
+    const timer = setTimeout(() => {
+      requestLocation();
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
       {isLoading && (
-        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center z-10">
           <div className="flex items-center space-x-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Obteniendo ubicación...</span>
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <span className="text-gray-700 dark:text-gray-300">Obteniendo ubicación...</span>
           </div>
         </div>
       )}
       
       <MapContainer
         center={[center.latitude, center.longitude]}
-        zoom={zoom}
+        zoom={markers.length > 0 ? 12 : zoom}
         style={{ height: '100%', width: '100%' }}
         zoomControl={true}
         scrollWheelZoom={true}
+        className="rounded-lg"
       >
-        <MapViewUpdater center={center} zoom={zoom} />
+        <MapViewUpdater center={center} zoom={markers.length > 0 ? 12 : zoom} />
         
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

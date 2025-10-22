@@ -1,0 +1,186 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║               🔧 SOLUCIÓN DE PROBLEMAS - OFERTAS                         ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+✅ PROBLEMA RESUELTO:
+--------------------
+
+Se eliminaron archivos conflictivos:
+- ❌ TechOS/src/components/job-offers/JobOffersPanel.tsx (antiguo)
+- ❌ Carpeta job-offers/ (vacía)
+- 🗑️ Caché de Vite limpiada
+- 🗑️ Carpeta dist/ limpiada
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                          ┃
+┃                    PASOS DE VERIFICACIÓN                                 ┃
+┃                                                                          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+1. ESPERA A QUE EL SERVIDOR INICIE
+-----------------------------------
+
+En la terminal deberías ver algo como:
+
+  VITE v5.4.19  ready in XXX ms
+  ➜  Local:   http://localhost:XXXX/
+
+(Anota el puerto que aparece)
+
+
+2. VERIFICA LA CONSOLA
+-----------------------
+
+Busca estos mensajes (NO deberían aparecer):
+❌ "No matching export in JobOffersPanel"
+❌ "Failed to scan for dependencies"
+
+Si aparecen:
+→ Ctrl+C para detener
+→ Ejecuta: npm run dev de nuevo
+
+
+3. ABRE EL NAVEGADOR
+---------------------
+
+Abre: http://localhost:XXXX/ofertas
+(Reemplaza XXXX con el puerto que viste)
+
+
+4. ¿QUÉ DEBERÍAS VER?
+---------------------
+
+✅ Página de ofertas con header azul
+✅ Título "Ofertas de Trabajo para Docentes"
+✅ Grid de tarjetas (si ejecutaste el SQL)
+✅ Loading skeletons (si está cargando)
+✅ Mensaje "No hay ofertas" (si NO ejecutaste el SQL)
+
+
+5. PRUEBA EL BOTÓN EN EL MAPA
+------------------------------
+
+a) Ve a: http://localhost:XXXX/map
+b) Espera a que carguen los marcadores (8 instituciones)
+c) Click en cualquier marcador (ej. UCV)
+d) Deberías ver un popup con:
+   - Nombre de la institución
+   - Badge con tipo
+   - Botón "💼 Ofertas Docentes" ⬅ NUEVO
+   - Botón "🗺️ Cómo llegar"
+e) Click en "Ofertas Docentes"
+f) Deberías ser redirigido a /ofertas?institutionId=...
+
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                                                          │
+│  SI AÚN NO VES OFERTAS:                                                  │
+│                                                                          │
+│  1. ¿Ejecutaste el SQL en Supabase?                                      │
+│     → Ve a: https://supabase.com/dashboard/project/jpqltnyuexzkzkdksifp  │
+│     → SQL Editor                                                         │
+│     → Ejecuta: SQL_JOB_OFFERS_CON_INSTITUCIONES.sql                      │
+│                                                                          │
+│  2. Verifica en Supabase que las tablas existen:                         │
+│     → Abre Table Editor                                                  │
+│     → Busca "institutions" (8 filas)                                     │
+│     → Busca "job_offers" (9 filas)                                       │
+│                                                                          │
+│  3. Abre la consola del navegador (F12):                                 │
+│     → Tab "Console"                                                      │
+│     → Busca errores en rojo                                              │
+│     → Busca: "🔄 Cargando ofertas laborales..."                          │
+│     → Busca: "✅ Ofertas cargadas: X"                                    │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+🔍 DIAGNÓSTICO SEGÚN LO QUE VES:
+--------------------------------
+
+CASO 1: Página en blanco
+→ Problema: Error de JavaScript
+→ Solución: Abre consola (F12), copia el error y reporta
+
+CASO 2: "No se encontraron ofertas"
+→ Problema: SQL no ejecutado o tabla vacía
+→ Solución: Ejecuta SQL_JOB_OFFERS_CON_INSTITUCIONES.sql
+
+CASO 3: Error 404 en /ofertas
+→ Problema: Servidor no se reinició correctamente
+→ Solución: Ctrl+C, luego npm run dev
+
+CASO 4: Botón "Ofertas Docentes" no aparece
+→ Problema: Caché del navegador
+→ Solución: Ctrl+Shift+R (hard refresh)
+
+CASO 5: "Column institution_id does not exist"
+→ Problema: SQL antiguo ejecutado
+→ Solución: Ejecuta SQL_JOB_OFFERS_CON_INSTITUCIONES.sql (incluye DROP TABLE)
+
+
+📊 VERIFICACIÓN PASO A PASO:
+----------------------------
+
+□ Servidor corriendo sin errores
+□ http://localhost:XXXX/ofertas carga
+□ http://localhost:XXXX/map carga
+□ Marcadores visibles en el mapa
+□ Click en marcador abre popup
+□ Popup muestra botón "Ofertas Docentes"
+□ Click en botón navega a /ofertas
+□ Se ven ofertas o mensaje apropiado
+
+
+🛠️ COMANDOS ÚTILES:
+-------------------
+
+Reiniciar servidor:
+  cd TechOS
+  npm run dev
+
+Limpiar caché:
+  cd TechOS
+  Remove-Item -Recurse -Force node_modules\.vite
+  Remove-Item -Recurse -Force dist
+  npm run dev
+
+Ver logs de Supabase en consola:
+  F12 → Console → Filtrar por "Supabase"
+
+
+📝 ARCHIVOS IMPORTANTES:
+------------------------
+
+Página de ofertas:
+  TechOS/src/pages/JobOffersPage.tsx ✅
+
+Mapa con botón:
+  TechOS/src/pages/MapPage.tsx ✅
+
+Ruta configurada:
+  TechOS/src/App.tsx ✅
+
+SQL para ejecutar:
+  TechOS/SQL_JOB_OFFERS_CON_INSTITUCIONES.sql
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    SIGUIENTE PASO AHORA:                                 ║
+║                                                                          ║
+║  1. Espera a que termine de cargar el servidor                           ║
+║  2. Abre http://localhost:XXXX/ofertas en tu navegador                   ║
+║  3. Reporta qué ves exactamente                                          ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+💡 TIP: Si ves errores, cópialos completos de la consola (F12) y repórtalos.
+
+

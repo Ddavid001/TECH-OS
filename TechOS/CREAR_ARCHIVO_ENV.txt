@@ -1,0 +1,38 @@
+═══════════════════════════════════════════════════════════════════
+   🔧 INSTRUCCIONES PARA CREAR EL ARCHIVO .ENV
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: CREAR EL ARCHIVO
+-------------------------
+1. Abre la carpeta TechOS en tu editor (VS Code o Cursor)
+2. Crea un nuevo archivo llamado:  .env
+   (CON EL PUNTO AL INICIO)
+
+PASO 2: COPIAR ESTE CONTENIDO
+------------------------------
+Copia y pega EXACTAMENTE esto en el archivo .env:
+
+VITE_SUPABASE_URL=https://jpqltnyuexzkzkdksifp.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcWx0bnl1ZXh6a3prZGtzaWZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NzE1NjEsImV4cCI6MjA3NjU0NzU2MX0.C4Dn2fiYGypNTT_Y13fPbIT7nUP_zwOwpQ30LS1UcCM
+
+PASO 3: GUARDAR Y REINICIAR
+----------------------------
+1. Guarda el archivo .env (Ctrl + S)
+2. Detén el servidor en la terminal (Ctrl + C)
+3. Ejecuta:
+   cd TechOS
+   npm run dev
+
+PASO 4: VERIFICAR
+-----------------
+1. Ve a http://localhost:XXXX/map
+2. Abre la consola (F12)
+3. Deberías ver:
+   ✅ Instituciones cargadas: 8
+   🗺️ Marcadores para el mapa: 8
+
+═══════════════════════════════════════════════════════════════════
+   ✅ DESPUÉS DE ESTO, TODO FUNCIONARÁ
+═══════════════════════════════════════════════════════════════════
+
+

@@ -18,6 +18,7 @@ const JobOffersPage = lazy(() => import("./pages/JobOffersPage"));
 const ApplicationsPortal = lazy(() => import("./pages/ApplicationsPortal"));
 const TeacherApplication = lazy(() => import("./pages/TeacherApplication"));
 const InstitutionApplication = lazy(() => import("./pages/InstitutionApplication"));
+const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const TeacherDashboard = lazy(() => import("./pages/TeacherDashboard"));
 const TeacherCourseDetail = lazy(() => import("./pages/TeacherCourseDetail"));
@@ -46,7 +47,9 @@ const App = () => (
                 <Route path="/complete-registration" element={<CompleteRegistration />} />
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/caracas-map" element={<CaracasMapPage />} />
-                <Route path="/job-offers" element={<JobOffersPage />} />
+                <Route path="/ofertas" element={<JobOffersPage />} />
+                <Route path="/job-offers" element={<Navigate to="/ofertas" replace />} />
+                <Route path="/mis-postulaciones" element={<MyApplicationsPage />} />
                 <Route path="/test-image" element={<TestImage />} />
                 <Route path="/applications" element={<ApplicationsPortal />} />
                 <Route path="/applications/teacher" element={<TeacherApplication />} />

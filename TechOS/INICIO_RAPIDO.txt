@@ -1,0 +1,171 @@
+╔══════════════════════════════════════════════════════════════╗
+║              TECHOS - INICIO RÁPIDO                          ║
+║          Solución al Error de Pantalla en Blanco             ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────┐
+│ EL PROBLEMA:                                                 │
+└──────────────────────────────────────────────────────────────┘
+
+Error: [postcss] ENOENT: no such file or directory
+Archivo: ApplicantsSection.tsx
+
+CAUSA: Caché de Vite con referencias a archivos antiguos
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ LA SOLUCIÓN (YA APLICADA):                                   │
+└──────────────────────────────────────────────────────────────┘
+
+✅ Caché de Vite limpiada
+✅ Servidor reiniciado
+✅ Archivos modales creados correctamente
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ VERIFICA ESTOS 3 PASOS:                                      │
+└──────────────────────────────────────────────────────────────┘
+
+PASO 1: ¿Existe el archivo .env?
+────────────────────────────────
+Ubicación: TechOS\.env
+
+Contenido esperado:
+VITE_SUPABASE_URL=https://jpqltnyuexzkzkdksifp.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+Si NO existe, CRÉALO con ese contenido.
+
+
+PASO 2: ¿Se ejecutó el SQL en Supabase?
+────────────────────────────────────────
+1. Ir a: https://supabase.com
+2. Tu proyecto → SQL Editor
+3. Copiar TODO el contenido de: SQL_COMPLETO_CON_MAPA.sql
+4. Ejecutar
+
+Esto crea:
+- 10 ofertas laborales
+- Coordenadas de instituciones en Caracas
+
+
+PASO 3: ¿El servidor está corriendo?
+────────────────────────────────────
+El servidor debería estar ejecutándose.
+
+Si no, ejecuta:
+cd TechOS
+npm run dev
+
+Busca esta línea en la terminal:
+➜  Local:   http://localhost:XXXX/
+
+Abre esa URL en tu navegador.
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ LO QUE DEBERÍAS VER:                                         │
+└──────────────────────────────────────────────────────────────┘
+
+✓ Landing page con video de fondo oscuro
+✓ Logo TechOS grande en el centro
+✓ Navegación superior: [Logo] | Mapa | Ofertas | Postulaciones
+✓ Título "TechOS" con gradiente de colores
+✓ 3 botones principales:
+  - Ver Ofertas Laborales (azul)
+  - Ver Postulaciones (teal)
+  - Mapa de Instituciones (transparente)
+✓ 3 tarjetas de características
+✓ Footer blanco con logo y copyright
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ SI AÚN HAY PROBLEMAS:                                        │
+└──────────────────────────────────────────────────────────────┘
+
+PROBLEMA: Pantalla sigue en blanco
+SOLUCIÓN: 
+1. Abrir DevTools (F12)
+2. Ver pestaña "Console"
+3. Buscar errores en rojo
+4. Si dice "VITE_SUPABASE_URL is required":
+   → Crear archivo .env (ver PASO 1)
+
+PROBLEMA: Los botones no abren modales
+SOLUCIÓN:
+1. Ejecutar el SQL en Supabase (ver PASO 2)
+2. Esperar 30 segundos para que compile
+3. Refrescar la página (F5)
+
+PROBLEMA: Error 404 en recursos
+SOLUCIÓN:
+1. Verificar que existe: public/logo.png
+2. Verificar que existe: public/Educational_Campus_Montage_Video_Generation.mp4
+
+PROBLEMA: Servidor no inicia
+SOLUCIÓN:
+cd TechOS
+Remove-Item -Recurse -Force node_modules\.vite
+npm run dev
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ COMANDOS ÚTILES:                                             │
+└──────────────────────────────────────────────────────────────┘
+
+# Limpiar caché y reiniciar
+cd TechOS
+Remove-Item -Recurse -Force node_modules\.vite
+npm run dev
+
+# Verificar que .env existe
+Test-Path TechOS\.env
+
+# Ver contenido de .env
+Get-Content TechOS\.env
+
+# Detener todos los procesos Node
+Get-Process node | Stop-Process -Force
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ ARCHIVOS IMPORTANTES:                                        │
+└──────────────────────────────────────────────────────────────┘
+
+DOCUMENTACIÓN:
+- SOLUCION_ERROR_PANTALLA_BLANCA.md ← Solución detallada
+- RESUMEN_FINAL_MEJORADO.md ← Resumen de implementación
+- LEEME_PRIMERO.txt ← Instrucciones iniciales
+- SQL_COMPLETO_CON_MAPA.sql ← Script para Supabase
+
+ARCHIVOS CRÍTICOS:
+- .env ← Variables de entorno (DEBE EXISTIR)
+- public/logo.png ← Logo TechOS
+- src/components/JobOffersModal.tsx ← Modal ofertas
+- src/components/ApplicantsModal.tsx ← Modal postulaciones
+
+
+┌──────────────────────────────────────────────────────────────┐
+│ URL DE LA APLICACIÓN:                                        │
+└──────────────────────────────────────────────────────────────┘
+
+Una vez que el servidor inicie, busca en la terminal:
+
+  VITE v5.x.x ready in XXX ms
+
+  ➜  Local:   http://localhost:8084/   ← ABRE ESTA URL
+  ➜  Network: http://192.168.x.x:8084/
+
+(El puerto puede variar: 8080, 8081, 8082, 8083, 8084, etc.)
+
+
+╔══════════════════════════════════════════════════════════════╗
+║                    ¡TODO ESTÁ LISTO!                         ║
+║                                                              ║
+║  El servidor debería estar ejecutándose ahora.               ║
+║  Abre la URL que muestra en tu navegador.                    ║
+╚══════════════════════════════════════════════════════════════╝
+
+Última actualización: 21 de Octubre 2025
+
+

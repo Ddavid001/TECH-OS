@@ -1,0 +1,93 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         TechOS - INSTRUCCIONES RÁPIDAS                       ║
+║                                                                              ║
+║  SIGUE ESTOS 3 PASOS PARA QUE LA APLICACIÓN FUNCIONE                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PASO 1: CREAR ARCHIVO .env                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. En la carpeta "TechOS", crear un archivo llamado: .env
+   
+2. Copiar y pegar este contenido (EXACTAMENTE):
+
+VITE_SUPABASE_URL=https://jpqltnyuexzkzkdksifp.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcWx0bnl1ZXh6a3prZGtzaWZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk0NTA3NDAsImV4cCI6MjA0NTAyNjc0MH0.j7fOtmYdOLWqYVNQPQywH9hB9LkZJO_K8sKKhfWBxcc
+
+3. Guardar el archivo
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PASO 2: APLICAR SQL EN SUPABASE                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. Ir a: https://supabase.com
+2. Seleccionar tu proyecto
+3. Click en "SQL Editor" (menú izquierdo)
+4. Copiar TODO el contenido del archivo: SQL_COMPLETO_CON_MAPA.sql
+5. Pegar en el editor
+6. Click en "Run" (ejecutar)
+7. Esperar a que termine (debe decir "Success")
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PASO 3: EJECUTAR LA APLICACIÓN                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. Abrir terminal en la carpeta TechOS
+2. Ejecutar:
+   
+   npm run dev
+
+3. Abrir navegador en: http://localhost:8082
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              ¡LISTO!                                         ║
+║                                                                              ║
+║  Ahora verás:                                                                ║
+║  ✓ Landing page con video de fondo                                          ║
+║  ✓ Logo TechOS                                                               ║
+║  ✓ 3 botones: Ofertas Laborales, Postulaciones, Mapa                        ║
+║  ✓ Footer con copyright                                                      ║
+║  ✓ Todo en UNA SOLA PÁGINA (sin scroll)                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+PROBLEMAS COMUNES:
+------------------
+➤ Pantalla en blanco
+   → Verificar que el archivo .env existe y tiene el contenido correcto
+   → Reiniciar el servidor (Ctrl+C y npm run dev)
+
+➤ Los botones no hacen nada
+   → Esperar a que compile (puede tomar 30-60 segundos)
+   → Verificar la consola del navegador (F12)
+
+➤ No aparecen ofertas en el modal
+   → Verificar que se ejecutó el SQL en Supabase
+   → Ir a Supabase → Table Editor → job_offers (debe haber 10 filas)
+
+
+ARCHIVOS IMPORTANTES:
+---------------------
+✓ .env                          → Variables de entorno (CREAR ESTE)
+✓ SQL_COMPLETO_CON_MAPA.sql    → Script para copiar en Supabase
+✓ INSTRUCCIONES_FINALES.md     → Documentación completa
+✓ public/logo.png              → Logo TechOS (ya copiado)
+
+
+CONTACTO:
+---------
+Si todo falla:
+1. Leer INSTRUCCIONES_FINALES.md (documentación detallada)
+2. Verificar la consola del navegador (F12 → Console)
+3. Verificar la consola de la terminal donde corre npm run dev
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                    Última actualización: 21 Octubre 2025
+═══════════════════════════════════════════════════════════════════════════════
+
+

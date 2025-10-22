@@ -63,5 +63,33 @@
 
   "footer": {
     "copyright": "© 2025 TechOS. All rights reserved."
+  },
+  "jobOffers": {
+    "title": "Teaching Job Opportunities",
+    "subtitle": "Find your next professional opportunity",
+    "errorLoading": "Error loading offers",
+    "noOffers": "No offers available",
+    "noOffersForInstitution": "No offers for this institution",
+    "checkBackLater": "Check back soon for new opportunities",
+    "backToMap": "Back to Map",
+    "backToHome": "Back to Home",
+    "showing": "Showing",
+    "offer": "offer",
+    "offers": "offers",
+    "active": "Active",
+    "branch": "Branch",
+    "schedule": "Schedule",
+    "salary": "Salary",
+    "requirements": "Requirements",
+    "apply": "Apply",
+    "applyingSoon": "Coming Soon",
+    "applyDescription": "Application feature will be available soon",
+    "viewOnMap": "View on Map"
+  },
+  "map": {
+    "teacherOfferButton": "Teaching Offers"
+  },
+  "common": {
+    "back": "Back"
   }
 }

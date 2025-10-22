@@ -1,240 +1,823 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { InteractiveMap } from '@/components/map/InteractiveMap';
+import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapMarker, InstitutionType } from '@/types';
-import { useMapStore, useAppStore } from '@/stores/app-store';
-import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Search, Filter, Navigation, Building, GraduationCap, BookOpen } from 'lucide-react';
-import { db } from '@/lib/supabase-helper';
+import { MapPin, Search, Filter, X, Loader2, Building, GraduationCap, BookOpen, Navigation as NavigationIcon, MapPinned, Route, Globe, Briefcase } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { Icon } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default markers
+delete (Icon.Default.prototype as any)._getIconUrl;
+Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+interface Institution {
+  id: string;
+  name: string;
+  type: 'school' | 'university' | 'institute';
+  latitude: number;
+  longitude: number;
+}
+
+interface MapMarker {
+  id: string;
+  name: string;
+  type: 'school' | 'university' | 'institute';
+  latitude: number;
+  longitude: number;
+}
 
 /**
- * Map Page Component
+ * Component to update map view
+ */
+const MapViewUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [map, center, zoom]);
+  
+  return null;
+};
+
+/**
+ * Create custom marker icons
+ */
+const createCustomIcon = (type: string) => {
+  const colors = {
+    school: '#3b82f6',
+    university: '#8b5cf6',
+    institute: '#10b981',
+  };
+  
+  const color = colors[type as keyof typeof colors] || '#3b82f6';
+  
+  return new Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(`
+      <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 12.5 12.5 28.5 12.5 28.5s12.5-16 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="${color}"/>
+        <circle cx="12.5" cy="12.5" r="8" fill="white"/>
+      </svg>
+    `)}`,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+};
+
+/**
+ * User location marker icon
+ */
+const userLocationIcon = new Icon({
+  iconUrl: `data:image/svg+xml;base64,${btoa(`
+    <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 12.5 12.5 28.5 12.5 28.5s12.5-16 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="#ef4444"/>
+      <circle cx="12.5" cy="12.5" r="8" fill="white"/>
+      <circle cx="12.5" cy="12.5" r="4" fill="#ef4444"/>
+    </svg>
+  `)}`,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+});
+
+/**
+ * Map Page Component - Mapa con Geolocalización
  */
 const MapPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, userRole } = useAuth();
   const { toast } = useToast();
-  const { markers, isLoading } = useMapStore();
-  const { setMapMarkers, setMapLoading } = useAppStore();
+  const navigate = useNavigate();
   
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<InstitutionType | 'all'>('all');
+  const [selectedType, setSelectedType] = useState<'all' | 'school' | 'university' | 'institute'>('all');
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
-  const [institutions, setInstitutions] = useState<MapMarker[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<Institution[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number} | null>(null);
+  const [locationPermissionAsked, setLocationPermissionAsked] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(true);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([10.4806, -66.9036]); // Caracas
+  const [mapZoom, setMapZoom] = useState(12);
+  const [userCountry, setUserCountry] = useState<string>('Venezuela');
 
   /**
-   * Load institutions from database
+   * Detect user's location using IP Geolocation API
+   */
+  const detectUserLocationByIP = useCallback(async () => {
+    try {
+      // Using ip-api.com for free IP geolocation
+      const response = await fetch('http://ip-api.com/json/?fields=status,country,countryCode,lat,lon,city');
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        console.log('📍 Ubicación detectada por IP:', data);
+        setUserCountry(data.country);
+        
+        const location = {
+          latitude: data.lat,
+          longitude: data.lon,
+        };
+        
+        setUserLocation(location);
+        setMapCenter([data.lat, data.lon]);
+        setMapZoom(12);
+        
+        toast({
+          title: `Ubicación: ${data.city}, ${data.country}`,
+          description: 'Mostrando instituciones en tu región',
+        });
+      }
+    } catch (error) {
+      console.error('Error detecting location by IP:', error);
+    }
+  }, [toast]);
+
+  /**
+   * Request user location permission using Geolocation API
+   */
+  const requestUserLocation = useCallback(async () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: 'Geolocalización no disponible',
+        description: 'Intentando detectar ubicación por IP...',
+        variant: 'default',
+      });
+      await detectUserLocationByIP();
+      return;
+    }
+
+    setLocationPermissionAsked(true);
+    setShowLocationPrompt(false);
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        });
+      });
+
+      const location = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+
+      setUserLocation(location);
+      setMapCenter([position.coords.latitude, position.coords.longitude]);
+      setMapZoom(14);
+
+      toast({
+        title: '✅ Ubicación obtenida',
+        description: 'Mostrando instituciones cerca de ti',
+      });
+    } catch (error: any) {
+      console.error('Error getting location:', error);
+      
+      toast({
+        title: 'Detectando ubicación alternativa',
+        description: 'Usando geolocalización por IP...',
+      });
+      
+      await detectUserLocationByIP();
+    }
+  }, [toast, detectUserLocationByIP]);
+
+  /**
+   * Load institutions from Supabase (with demo data fallback)
    */
   const loadInstitutions = useCallback(async () => {
     try {
-      setMapLoading(true);
+      setIsLoading(true);
+      console.log('🔄 Cargando instituciones desde Supabase...');
       
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from('institutions')
-        .select('id, name, type, address, latitude, longitude')
+        .select('id, name, type, latitude, longitude')
         .not('latitude', 'is', null)
-        .not('longitude', 'is', null);
+        .not('longitude', 'is', null)
+        .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('⚠️ Error de Supabase (usando datos de demostración):', error);
+        // Use demo data if Supabase fails
+        loadDemoInstitutions();
+        return;
+      }
 
-      const institutionMarkers: MapMarker[] = (data || []).map(inst => ({
-        id: inst.id,
-        name: inst.name,
-        type: inst.type,
-        latitude: inst.latitude!,
-        longitude: inst.longitude!,
-        address: inst.address,
-      }));
+      if (!data || data.length === 0) {
+        console.log('⚠️ No hay datos en Supabase, cargando datos de demostración');
+        loadDemoInstitutions();
+        return;
+      }
 
-      setInstitutions(institutionMarkers);
-      setMapMarkers(institutionMarkers);
+      console.log(`✅ Instituciones cargadas desde Supabase: ${data.length}`);
+      setInstitutions(data);
+      
     } catch (error: any) {
-      console.error('Error loading institutions:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las instituciones',
-        variant: 'destructive',
-      });
+      console.error('⚠️ Error loading institutions (usando datos de demostración):', error);
+      loadDemoInstitutions();
     } finally {
-      setMapLoading(false);
+      setIsLoading(false);
     }
-  }, [setMapMarkers, setMapLoading, toast]);
+  }, [toast]);
+
+  /**
+   * Load demo institutions (shown if Supabase is not configured)
+   */
+  const loadDemoInstitutions = () => {
+    const demoData: Institution[] = [
+      {
+        id: 'demo-1',
+        name: 'Universidad Central de Venezuela (UCV)',
+        type: 'university',
+        latitude: 10.489722,
+        longitude: -66.889167,
+      },
+      {
+        id: 'demo-2',
+        name: 'Universidad Simón Bolívar (USB)',
+        type: 'university',
+        latitude: 10.408611,
+        longitude: -66.886111,
+      },
+      {
+        id: 'demo-3',
+        name: 'Universidad Católica Andrés Bello (UCAB)',
+        type: 'university',
+        latitude: 10.503056,
+        longitude: -66.936944,
+      },
+      {
+        id: 'demo-4',
+        name: 'Universidad Metropolitana',
+        type: 'university',
+        latitude: 10.497222,
+        longitude: -66.826389,
+      },
+      {
+        id: 'demo-5',
+        name: 'Universidad Santa María',
+        type: 'university',
+        latitude: 10.502778,
+        longitude: -66.876944,
+      },
+      {
+        id: 'demo-6',
+        name: 'Colegio Emil Friedman',
+        type: 'school',
+        latitude: 10.476667,
+        longitude: -66.869444,
+      },
+      {
+        id: 'demo-7',
+        name: 'Colegio San Ignacio de Loyola',
+        type: 'school',
+        latitude: 10.494722,
+        longitude: -66.865278,
+      },
+      {
+        id: 'demo-8',
+        name: 'IUPOLC',
+        type: 'institute',
+        latitude: 10.488056,
+        longitude: -66.877500,
+      },
+    ];
+    
+    console.log('📍 Cargando 8 instituciones de demostración de Caracas');
+    setInstitutions(demoData);
+    
+    toast({
+      title: '📍 Instituciones de demostración',
+      description: 'Mostrando 8 instituciones de Caracas',
+    });
+  };
+
+  /**
+   * Handle search with autocomplete (Google Maps style)
+   */
+  const handleSearch = useCallback((value: string) => {
+    setSearchTerm(value);
+    
+    if (value.trim().length > 0) {
+      const suggestions = institutions.filter(inst =>
+        inst.name.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5); // Top 5 suggestions
+      
+      setSearchSuggestions(suggestions);
+      setShowSuggestions(true);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [institutions]);
+
+  /**
+   * Select institution from search (auto-zoom and center)
+   */
+  const selectInstitutionFromSearch = useCallback((institution: Institution) => {
+    setSearchTerm(institution.name);
+    setShowSuggestions(false);
+    
+    // Center map on selected institution
+    setMapCenter([institution.latitude, institution.longitude]);
+    setMapZoom(16); // Close zoom like Google Maps
+    
+    // Select marker
+    setSelectedMarker({
+      id: institution.id,
+      name: institution.name,
+      type: institution.type,
+      latitude: institution.latitude,
+      longitude: institution.longitude,
+    });
+
+    toast({
+      title: institution.name,
+      description: 'Ubicación encontrada',
+    });
+  }, [toast]);
 
   /**
    * Filter institutions based on search and type
    */
   const filteredInstitutions = institutions.filter(inst => {
-    const matchesSearch = inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         inst.address?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === '' || 
+      inst.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'all' || inst.type === selectedType;
     return matchesSearch && matchesType;
   });
+
+  /**
+   * Convert institutions to map markers
+   */
+  const mapMarkers: MapMarker[] = useMemo(() => {
+    const markers = filteredInstitutions.map(inst => ({
+      id: inst.id,
+      name: inst.name,
+      type: inst.type,
+      latitude: inst.latitude,
+      longitude: inst.longitude,
+    }));
+    
+    console.log(`🗺️ Marcadores para el mapa: ${markers.length}`);
+    return markers;
+  }, [filteredInstitutions]);
 
   /**
    * Handle marker click
    */
   const handleMarkerClick = useCallback((marker: MapMarker) => {
     setSelectedMarker(marker);
+    setMapCenter([marker.latitude, marker.longitude]);
+    setMapZoom(16);
   }, []);
 
   /**
-   * Handle institution selection from list
+   * Clear all filters and search
    */
-  const handleInstitutionSelect = useCallback((institution: MapMarker) => {
-    setSelectedMarker(institution);
-    // Center map on selected institution
-    // This would require updating the map center in the store
-  }, []);
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedType('all');
+    setSelectedMarker(null);
+    setShowSuggestions(false);
+  };
 
   /**
-   * Load institutions on component mount
+   * Get directions to institution (Google Maps link)
+   */
+  const getDirections = useCallback((institution: MapMarker) => {
+    if (userLocation) {
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${institution.latitude},${institution.longitude}`;
+      window.open(url, '_blank');
+    } else {
+      const url = `https://www.google.com/maps/search/?api=1&query=${institution.latitude},${institution.longitude}`;
+      window.open(url, '_blank');
+    }
+  }, [userLocation]);
+
+  /**
+   * Get institution type label
+   */
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'school':
+        return 'Escuela';
+      case 'university':
+        return 'Universidad';
+      case 'institute':
+        return 'Instituto';
+      default:
+        return type;
+    }
+  };
+
+  /**
+   * Get institution type icon
+   */
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'school':
+        return <BookOpen className="h-4 w-4" />;
+      case 'university':
+        return <GraduationCap className="h-4 w-4" />;
+      case 'institute':
+        return <Building className="h-4 w-4" />;
+      default:
+        return <MapPin className="h-4 w-4" />;
+    }
+  };
+
+  /**
+   * Load institutions and detect location on component mount
    */
   useEffect(() => {
     loadInstitutions();
-  }, [loadInstitutions]);
+    
+    // Auto-detect location by IP on first load
+    const timer = setTimeout(() => {
+      detectUserLocationByIP();
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [loadInstitutions, detectUserLocationByIP]);
 
   /**
-   * Redirect if not authenticated
+   * Show location prompt on mount
    */
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
+    if (!locationPermissionAsked) {
+      const timer = setTimeout(() => {
+        setShowLocationPrompt(true);
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  }, [user, navigate]);
-
-  if (!user) {
-    return null;
-  }
+  }, [locationPermissionAsked]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">Mapa de Instituciones</h1>
-              <Badge variant="outline" className="text-xs">
-                {filteredInstitutions.length} instituciones
-              </Badge>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/dashboard')}
-              >
-                Volver al Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Navigation */}
+      <MainNavigation />
 
-      <div className="flex h-[calc(100vh-4rem)]">
-        {/* Sidebar */}
-        <div className="w-80 bg-white border-r overflow-y-auto">
-          <div className="p-4 space-y-4">
-            {/* Search and Filters */}
-            <div className="space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar instituciones..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              <Select value={selectedType} onValueChange={(value) => setSelectedType(value as InstitutionType | 'all')}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los tipos</SelectItem>
-                  <SelectItem value="school">Escuelas</SelectItem>
-                  <SelectItem value="university">Universidades</SelectItem>
-                  <SelectItem value="institute">Institutos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)]">
+          {/* Left Sidebar - Search & List */}
+          <div className="lg:w-96 flex flex-col space-y-4">
+            {/* Search Box (Google Maps style) */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                    placeholder="Buscar institución..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
+                    className="pl-10 pr-10 h-12 text-base"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={clearFilters}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                  
+                  {/* Search Suggestions Dropdown */}
+                  {showSuggestions && searchSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border dark:border-gray-700 z-50 max-h-80 overflow-y-auto">
+                      {searchSuggestions.map((inst) => (
+                        <button
+                          key={inst.id}
+                          onClick={() => selectInstitutionFromSearch(inst)}
+                          className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-left border-b dark:border-gray-700 last:border-b-0 transition-colors"
+                        >
+                          <div className="flex items-start space-x-3">
+                            <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm truncate">{inst.name}</p>
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                {getTypeLabel(inst.type)}
+                              </Badge>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Institution List */}
-            <div className="space-y-2">
-              <h3 className="font-medium text-gray-900">Instituciones</h3>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                </div>
-              ) : filteredInstitutions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p>No se encontraron instituciones</p>
-                </div>
-              ) : (
-                filteredInstitutions.map((institution) => (
-                  <Card
-                    key={institution.id}
-                    className={`cursor-pointer transition-colors ${
-                      selectedMarker?.id === institution.id ? 'ring-2 ring-primary' : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => handleInstitutionSelect(institution)}
+            {/* Filters */}
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Filtros</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="lg:hidden"
                   >
-                    <CardContent className="p-3">
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                          {institution.type === 'school' && <Building className="h-5 w-5 text-blue-500" />}
-                          {institution.type === 'university' && <GraduationCap className="h-5 w-5 text-purple-500" />}
-                          {institution.type === 'institute' && <BookOpen className="h-5 w-5 text-green-500" />}
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className={`space-y-4 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tipo de Institución</label>
+                  <Select value={selectedType} onValueChange={(value: any) => setSelectedType(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="school">
+                        <div className="flex items-center space-x-2">
+                          <BookOpen className="h-4 w-4" />
+                          <span>Escuelas</span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm text-gray-900 truncate">
-                            {institution.name}
-                          </h4>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {institution.address}
-                          </p>
-                          <Badge variant="secondary" className="mt-2 text-xs">
-                            {institution.type === 'school' ? 'Escuela' : 
-                             institution.type === 'university' ? 'Universidad' : 'Instituto'}
-                          </Badge>
+                      </SelectItem>
+                      <SelectItem value="university">
+                        <div className="flex items-center space-x-2">
+                          <GraduationCap className="h-4 w-4" />
+                          <span>Universidades</span>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+                      </SelectItem>
+                      <SelectItem value="institute">
+                        <div className="flex items-center space-x-2">
+                          <Building className="h-4 w-4" />
+                          <span>Institutos</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-        {/* Map */}
-        <div className="flex-1">
-          <InteractiveMap
-            markers={filteredInstitutions}
-            onMarkerClick={handleMarkerClick}
-            height="100%"
-          />
+                {/* Location Button */}
+                <Button
+                  variant="outline"
+                  onClick={requestUserLocation}
+                  className="w-full"
+                >
+                  <NavigationIcon className="h-4 w-4 mr-2" />
+                  {userLocation ? 'Actualizar ubicación' : 'Obtener mi ubicación'}
+                </Button>
+
+                {/* Results Count */}
+                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-2 border-t">
+                  <span className="font-medium">Resultados:</span>
+                  <Badge variant="secondary">
+                    {filteredInstitutions.length} de {institutions.length}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Institutions List */}
+            <Card className="flex-1 overflow-hidden">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Instituciones</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : filteredInstitutions.length === 0 ? (
+                  <div className="text-center py-12 px-4">
+                    <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">
+                      No se encontraron instituciones
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      {institutions.length === 0 
+                        ? 'Cargando datos...'
+                        : 'Intenta con otro filtro o búsqueda'
+                      }
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-y-auto max-h-[calc(100vh-32rem)] px-4 pb-4 space-y-2">
+                    {filteredInstitutions.map((inst) => (
+                      <Card
+                        key={inst.id}
+                        className={`cursor-pointer transition-all hover:shadow-md ${
+                          selectedMarker?.id === inst.id
+                            ? 'ring-2 ring-primary bg-primary/5'
+                            : ''
+                        }`}
+                        onClick={() => selectInstitutionFromSearch(inst)}
+                      >
+                        <CardContent className="p-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-sm mb-1">{inst.name}</h3>
+                              <div className="flex items-center space-x-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  <span className="mr-1">{getTypeIcon(inst.type)}</span>
+                                  {getTypeLabel(inst.type)}
+                                </Badge>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  getDirections({
+                                    id: inst.id,
+                                    name: inst.name,
+                                    type: inst.type,
+                                    latitude: inst.latitude,
+                                    longitude: inst.longitude,
+                                  });
+                                }}
+                                className="w-full mt-2"
+                              >
+                                <Route className="h-3 w-3 mr-1" />
+                                Cómo llegar
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Side - Map */}
+          <div className="flex-1 lg:min-h-full relative">
+            <Card className="h-full">
+              <CardContent className="p-0 h-full relative">
+                {isLoading ? (
+                  <div className="h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    style={{ height: '100%', width: '100%' }}
+                    zoomControl={true}
+                    scrollWheelZoom={true}
+                    className="rounded-lg z-0"
+                  >
+                    <MapViewUpdater center={mapCenter} zoom={mapZoom} />
+                    
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    
+                    {/* User Location Marker */}
+                    {userLocation && (
+                      <Marker
+                        position={[userLocation.latitude, userLocation.longitude]}
+                        icon={userLocationIcon}
+                      >
+                        <Popup>
+                          <div className="text-center">
+                            <p className="font-semibold text-base mb-1">📍 Tu ubicación</p>
+                            <p className="text-sm text-gray-600">
+                              {userCountry}
+                            </p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    )}
+                    
+                    {/* Institution Markers */}
+                    {mapMarkers.map((marker) => (
+                      <Marker
+                        key={marker.id}
+                        position={[marker.latitude, marker.longitude]}
+                        icon={createCustomIcon(marker.type)}
+                        eventHandlers={{
+                          click: () => handleMarkerClick(marker),
+                        }}
+                      >
+                        <Popup>
+                          <div className="min-w-[200px]">
+                            <h3 className="font-semibold text-base mb-2">{marker.name}</h3>
+                            <Badge variant="secondary" className="mb-3">
+                              {getTypeIcon(marker.type)}
+                              <span className="ml-1">{getTypeLabel(marker.type)}</span>
+                            </Badge>
+                            <div className="space-y-2">
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => navigate(`/ofertas?institutionId=${marker.id}`)}
+                                className="w-full"
+                              >
+                                <Briefcase className="h-4 w-4 mr-2" />
+                                Ofertas Docentes
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => getDirections(marker)}
+                                className="w-full"
+                              >
+                                <Route className="h-4 w-4 mr-2" />
+                                Cómo llegar
+                              </Button>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+                )}
+              </CardContent>
+            </Card>
+
+
+            {/* Location Permission Prompt (Superpuesto al Mapa) */}
+            {showLocationPrompt && !locationPermissionAsked && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-sm px-4">
+                <Card className="shadow-2xl border-2 border-primary bg-white dark:bg-gray-800 animate-in slide-in-from-top">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center space-x-2 text-base">
+                      <Globe className="h-5 w-5 text-primary animate-pulse" />
+                      <span>¿Permitir ubicación?</span>
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      Te mostraremos instituciones académicas cerca de ti
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col space-y-2">
+                      <Button 
+                        onClick={requestUserLocation}
+                        className="w-full"
+                        size="default"
+                      >
+                        <NavigationIcon className="h-4 w-4 mr-2" />
+                        Obtener ubicación precisa
+                      </Button>
+                      <Button 
+                        variant="secondary"
+                        onClick={() => {
+                          setShowLocationPrompt(false);
+                          detectUserLocationByIP();
+                        }}
+                        className="w-full"
+                        size="sm"
+                      >
+                        <Globe className="h-4 w-4 mr-2" />
+                        Usar ubicación aproximada (IP)
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        onClick={() => setShowLocationPrompt(false)}
+                        className="w-full"
+                        size="sm"
+                      >
+                        Cerrar
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Selected Institution Details */}
+      {/* Selected Marker Details Modal (Google Maps style) */}
       {selectedMarker && (
-        <div className="fixed bottom-4 left-4 right-4 z-30 max-w-md mx-auto">
-          <Card className="bg-white shadow-lg">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+          <Card className="shadow-2xl border-2">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1">
                   <CardTitle className="text-lg">{selectedMarker.name}</CardTitle>
-                  <CardDescription className="text-sm">
-                    {selectedMarker.address}
+                  <CardDescription className="mt-1">
+                    <Badge variant="secondary" className="mr-2">
+                      <span className="mr-1">{getTypeIcon(selectedMarker.type)}</span>
+                      {getTypeLabel(selectedMarker.type)}
+                    </Badge>
                   </CardDescription>
                 </div>
                 <Button
@@ -242,21 +825,24 @@ const MapPage: React.FC = () => {
                   size="sm"
                   onClick={() => setSelectedMarker(null)}
                 >
-                  ×
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center justify-between">
-                <Badge variant="secondary">
-                  {selectedMarker.type === 'school' ? 'Escuela' : 
-                   selectedMarker.type === 'university' ? 'Universidad' : 'Instituto'}
-                </Badge>
-                <Button size="sm" variant="outline">
-                  <Navigation className="h-4 w-4 mr-2" />
-                  Direcciones
-                </Button>
+            <CardContent>
+              <div className="flex items-center space-x-2 text-xs text-gray-500 mb-3">
+                <NavigationIcon className="h-3 w-3" />
+                <span>
+                  {selectedMarker.latitude.toFixed(6)}, {selectedMarker.longitude.toFixed(6)}
+                </span>
               </div>
+              <Button
+                onClick={() => getDirections(selectedMarker)}
+                className="w-full"
+              >
+                <Route className="h-4 w-4 mr-2" />
+                Cómo llegar
+              </Button>
             </CardContent>
           </Card>
         </div>

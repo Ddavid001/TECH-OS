@@ -1,0 +1,192 @@
+================================================================================
+✅ VALIDACIÓN DE CONEXIÓN - PASO A PASO
+================================================================================
+
+Sigue estos pasos para confirmar que todo está funcionando correctamente.
+
+================================================================================
+PASO 1: VERIFICAR ARCHIVO .env.local ✓
+================================================================================
+
+1.1 En VSCode, abre la carpeta TechOS
+1.2 Busca el archivo: .env.local
+    (Si no lo ves, haz Ctrl+Shift+P → "Files: Exclude")
+
+1.3 Abre .env.local y verifica:
+
+    VITE_SUPABASE_URL=https://XXXXX.supabase.co
+    VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
+
+    ✅ DEBE haber 2 líneas
+    ✅ NO debe estar vacío
+    ✅ Las URLs deben empezar con "https://"
+
+================================================================================
+PASO 2: DETENER Y REINICIAR PROYECTO ✓
+================================================================================
+
+2.1 En terminal (Ctrl+C para detener)
+
+    npm run dev
+
+2.2 Espera a que salga:
+
+    ✅ VITE v5.x ready in xxx ms
+    ➜ Local: http://localhost:5173/
+
+================================================================================
+PASO 3: ABRIR NAVEGADOR ✓
+================================================================================
+
+3.1 Abre: http://localhost:5173/ofertas
+
+3.2 Abre DevTools (F12) → Pestaña Console
+
+================================================================================
+PASO 4: VERIFICAR MENSAJES EN CONSOLA ✓
+================================================================================
+
+ESPERADO (✅ Correcto):
+    ✅ Supabase configurado correctamente
+    ✅ URL: https://XXXXX...
+    ✅ Cargando ofertas laborales desde Supabase...
+    ✅ Ofertas cargadas: 45
+
+INCORRECTO (❌ Problemas):
+    ❌ VITE_SUPABASE_URL es requerida
+    ❌ VITE_SUPABASE_ANON_KEY es requerida
+    ❌ Error de Supabase: Object
+    ❌ Error completo: Error: Error al cargar ofertas
+
+================================================================================
+PASO 5: VERIFICAR PÁGINA ✓
+================================================================================
+
+Si todo está bien, en http://localhost:5173/ofertas deberías ver:
+
+    ✅ 45+ tarjetas de ofertas
+    ✅ Búsqueda funcional
+    ✅ Filtros por rama
+    ✅ Botones "Aplicar" y "Ver en Mapa"
+
+Si ves:
+    ❌ "No hay ofertas disponibles. Asegúrate de ejecutar el SQL en Supabase"
+    → Verifica que ejecutaste el SQL_COMPLETO_LISTO_PARA_EJECUTAR.sql
+
+================================================================================
+PASO 6: SI SIGUE SIN FUNCIONAR ✓
+================================================================================
+
+6.1 Abre Supabase Dashboard:
+    https://app.supabase.com → Tu proyecto → Table Editor
+
+6.2 ¿Ves la tabla job_offers?
+    ✅ SÍ → Próximo paso
+    ❌ NO → Ejecuta SQL_COMPLETO_LISTO_PARA_EJECUTAR.sql
+
+6.3 ¿Ves 45+ filas en job_offers?
+    ✅ SÍ → Próximo paso
+    ❌ NO → Reejecutar SQL
+
+6.4 En Supabase Settings → API, verifica:
+    ✅ Project URL es exacto (sin espacios)
+    ✅ Anon Public Key es exacto (sin espacios)
+
+6.5 Copia las credenciales exactamente:
+    • No agregues nada antes/después
+    • No dejes espacios
+    • Usa Ctrl+C para copiar (no copy-paste manual)
+
+6.6 En .env.local pega exactamente igual:
+    VITE_SUPABASE_URL=[Lo que copiaste]
+    VITE_SUPABASE_ANON_KEY=[Lo que copiaste]
+
+6.7 Guarda (Ctrl+S), detén proyecto (Ctrl+C), reinicia (npm run dev)
+
+================================================================================
+CHECKLIST DE VERIFICACIÓN:
+================================================================================
+
+ARCHIVO .env.local:
+    [ ] Existe el archivo .env.local
+    [ ] Tiene 2 líneas (URL y ANON_KEY)
+    [ ] No está vacío
+    [ ] URLs empiezan con "https://"
+
+CONSOLA (F12):
+    [ ] ✅ "Supabase configurado correctamente"
+    [ ] ✅ "Cargando ofertas laborales desde Supabase..."
+    [ ] ✅ "Ofertas cargadas: 45"
+    [ ] ❌ Sin errores rojos
+
+NAVEGADOR:
+    [ ] ✅ Ver 45+ ofertas reales
+    [ ] ✅ Búsqueda funciona
+    [ ] ✅ Filtros funcionan
+    [ ] ✅ Botones presentes
+
+SUPABASE:
+    [ ] ✅ job_offers tabla existe
+    [ ] ✅ 45+ filas en job_offers
+    [ ] ✅ Credentials son exactas
+
+================================================================================
+SI TODO ESTÁ BIEN:
+================================================================================
+
+¡Excelente! Tu sistema funciona. Ahora puedes:
+
+1. Login en /ofertas
+2. Click "Aplicar" en una oferta
+3. Completa el formulario
+4. Verifica tu aplicación en /mis-postulaciones
+5. Admin gestiona en /admin/dashboard
+
+================================================================================
+📞 ERRORES ESPECÍFICOS Y SOLUCIONES:
+================================================================================
+
+ERROR: "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+CAUSA: Variables de entorno incorrectas
+SOLUCIÓN: Verifica .env.local (consulta PASO 1)
+
+ERROR: "VITE_SUPABASE_URL es requerida"
+CAUSA: .env.local no existe o no tiene el archivo
+SOLUCIÓN: Crea .env.local (consulta CREAR_ENV_LOCAL.txt)
+
+ERROR: "Ofertas cargadas: 0" o "No hay ofertas"
+CAUSA: SQL no fue ejecutado en Supabase
+SOLUCIÓN: Ejecuta SQL_COMPLETO_LISTO_PARA_EJECUTAR.sql
+
+ERROR: "Error al cargar ofertas: TypeError: Failed to fetch"
+CAUSA: Credenciales incorrectas o URL inválida
+SOLUCIÓN: 
+  1. Copia credenciales nuevamente de Supabase Settings → API
+  2. Verifica sin espacios extras
+  3. Pega exactamente en .env.local
+
+ERROR: "Error de Supabase: Object"
+CAUSA: Error genérico de Supabase
+SOLUCIÓN:
+  1. Ve a Console (F12) y lee todo el error
+  2. Verifica que job_offers tabla existe
+  3. Verifica RLS policies están habilitadas
+
+================================================================================
+💡 TIPS:
+================================================================================
+
+• Siempre copia credenciales usando Ctrl+C (no copy-paste manual)
+• Después de cambiar .env.local, reinicia proyecto (Ctrl+C, npm run dev)
+• Abre DevTools (F12) para ver todos los errores
+• Si error persiste, recarga página (F5) y espera 10 segundos
+
+================================================================================
+✅ READY? CONTINÚA CON TUS PRUEBAS
+================================================================================
+
+Si todas las validaciones pasaron, tu sistema está funcionando correctamente.
+
+Sigue a: PASO_A_PASO_ARREGLANDO.md para próximos pasos.
+
+================================================================================

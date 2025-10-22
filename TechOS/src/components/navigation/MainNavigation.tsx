@@ -40,20 +40,19 @@ export const MainNavigation: React.FC = () => {
   // Navigation items with translations
   const navigationItems: NavigationItem[] = [
     {
-      label: 'Mapa de Caracas',
-      href: '/caracas-map',
+      label: 'Mapa',
+      href: '/map',
       icon: MapPin,
     },
     {
-      label: 'Ofertas Laborales',
-      href: '/job-offers',
+      label: 'Ofertas',
+      href: '/ofertas',
       icon: Building,
     },
     {
-      label: t('applications'),
-      href: '/applications',
+      label: 'Postulaciones',
+      href: '/#postulaciones',
       icon: FileText,
-      badge: 'Nuevo',
     },
   ];
 
@@ -66,27 +65,27 @@ export const MainNavigation: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700" role="navigation" aria-label="Navegación principal">
+    <nav className="bg-[#4a4a5e] shadow-sm" role="navigation" aria-label="Navegación principal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2" aria-label="TechOS - Ir al inicio">
-              <GraduationCap className="h-8 w-8 text-primary dark:text-blue-400" aria-hidden="true" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">TechOS</span>
+              <GraduationCap className="h-7 w-7 text-white" aria-hidden="true" />
+              <span className="text-lg font-bold text-white">TechOS</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8" role="menubar">
+          <div className="hidden md:flex items-center space-x-2" role="menubar">
             {navigationItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   isActive(item.href)
-                    ? 'bg-primary text-primary-foreground dark:bg-blue-600 dark:text-white'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
                 }`}
                 role="menuitem"
                 aria-current={isActive(item.href) ? 'page' : undefined}
@@ -95,7 +94,7 @@ export const MainNavigation: React.FC = () => {
                 <item.icon className="h-4 w-4" aria-hidden="true" />
                 <span>{item.label}</span>
                 {item.badge && (
-                  <Badge variant="secondary" className="text-xs" aria-label={`${item.badge} - Nuevo`}>
+                  <Badge className="ml-1 bg-indigo-700 text-white text-xs px-2 py-0.5">
                     {item.badge}
                   </Badge>
                 )}
@@ -104,19 +103,16 @@ export const MainNavigation: React.FC = () => {
           </div>
 
           {/* User Menu */}
-          <div className="hidden md:flex items-center space-x-4" role="menubar" aria-label="Menú de usuario">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
-            
+          <div className="hidden md:flex items-center space-x-3" role="menubar" aria-label="Menú de usuario">
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2" aria-label={`Usuario: ${user.email}`}>
-                  <User className="h-4 w-4 text-gray-500" aria-hidden="true" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <User className="h-4 w-4 text-gray-300" aria-hidden="true" />
+                  <span className="text-sm text-white">
                     {user.email}
                   </span>
                   {userRole && (
-                    <Badge variant="outline" className="text-xs" aria-label={`Rol: ${userRole === 'admin' ? 'Admin' : userRole === 'teacher' ? 'Profesor' : userRole === 'student' ? 'Estudiante' : 'Representante'}`}>
+                    <Badge className="bg-indigo-700 text-white text-xs" aria-label={`Rol: ${userRole === 'admin' ? 'Admin' : userRole === 'teacher' ? 'Profesor' : userRole === 'student' ? 'Estudiante' : 'Representante'}`}>
                       {userRole === 'admin' ? 'Admin' :
                        userRole === 'teacher' ? 'Profesor' :
                        userRole === 'student' ? 'Estudiante' : 'Representante'}
@@ -127,7 +123,7 @@ export const MainNavigation: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  className="text-white hover:bg-gray-700"
                   aria-label="Cerrar sesión"
                 >
                   <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -136,11 +132,11 @@ export const MainNavigation: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Button asChild variant="ghost" size="sm" className="dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                  <Link to="/login" aria-label="Iniciar sesión">{t('signIn')}</Link>
+                <Button asChild variant="ghost" size="sm" className="text-white hover:bg-gray-700">
+                  <Link to="/login" aria-label="Iniciar sesión">Iniciar Sesión</Link>
                 </Button>
-                <Button asChild size="sm" className="dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                  <Link to="/register" aria-label="Registrarse">{t('register')}</Link>
+                <Button asChild size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+                  <Link to="/register" aria-label="Registrarse">Registrarse</Link>
                 </Button>
               </div>
             )}
@@ -150,7 +146,7 @@ export const MainNavigation: React.FC = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-gray-700"
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
               aria-label="Abrir menú principal"

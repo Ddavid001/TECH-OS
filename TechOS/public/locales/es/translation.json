@@ -64,5 +64,33 @@
   "heroTitle3": "Eleva la Educación.",
   "footer": {
     "copyright": "© 2025 TechOS. Todos los derechos reservados."
+  },
+  "jobOffers": {
+    "title": "Ofertas de Trabajo para Docentes",
+    "subtitle": "Encuentra tu próxima oportunidad profesional",
+    "errorLoading": "Error al cargar ofertas",
+    "noOffers": "No hay ofertas disponibles",
+    "noOffersForInstitution": "No hay ofertas para esta institución",
+    "checkBackLater": "Vuelve pronto para ver nuevas oportunidades",
+    "backToMap": "Volver al Mapa",
+    "backToHome": "Volver al Inicio",
+    "showing": "Mostrando",
+    "offer": "oferta",
+    "offers": "ofertas",
+    "active": "Activa",
+    "branch": "Rama",
+    "schedule": "Horario",
+    "salary": "Salario",
+    "requirements": "Requisitos",
+    "apply": "Aplicar",
+    "applyingSoon": "Próximamente",
+    "applyDescription": "La función de postulación estará disponible pronto",
+    "viewOnMap": "Ver en Mapa"
+  },
+  "map": {
+    "teacherOfferButton": "Ofertas Docentes"
+  },
+  "common": {
+    "back": "Volver"
   }
 }

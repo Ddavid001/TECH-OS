@@ -184,6 +184,7 @@ const Login = () => {
               </Button>
             </form>
 
+            {/* Google OAuth deshabilitado - no configurado en Supabase
             <div className="my-4 flex items-center">
               <div className="flex-grow border-t border-muted"></div>
               <span className="mx-4 text-xs uppercase text-muted-foreground">O</span>
@@ -194,8 +195,9 @@ const Login = () => {
               <span className="mr-2 h-5 w-5">G</span>
               Continuar con Google
             </Button>
+            */}
 
-            <div className="mt-4 text-center">
+            <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 ¿No tienes cuenta?{' '}
                 <Link to="/register" className="text-primary hover:underline">

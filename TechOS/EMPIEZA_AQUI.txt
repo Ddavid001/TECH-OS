@@ -1,0 +1,124 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║                    ⚡ EMPIEZA AQUÍ - 2 MINUTOS ⚡                         ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+🎯 LO QUE TIENES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Sistema de mapa con 26 instituciones de Venezuela
+✅ 30+ ofertas de trabajo para docentes
+✅ Botón "Ofertas Docentes" en cada institución del mapa
+✅ Ofertas organizadas por bloques (institución)
+✅ Todo listo para funcionar
+
+
+⚡ HAZ ESTO AHORA (2 MINUTOS):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+1. ABRE SUPABASE
+   https://supabase.com/dashboard/project/jpqltnyuexzkzkdksifp
+   
+2. CLICK EN "SQL EDITOR"
+   
+3. CLICK EN "+ NEW QUERY"
+   
+4. ABRE EL ARCHIVO:
+   SQL_COMPLETO_INSTITUCIONES_Y_OFERTAS.sql
+   
+5. COPIA TODO (Ctrl + A, Ctrl + C)
+   
+6. PEGA EN SUPABASE (Ctrl + V)
+   
+7. CLICK EN "RUN" (botón verde)
+   
+8. ESPERA A VER "SUCCESS" ✅
+   
+9. ABRE: http://localhost:8084/map
+   
+10. REFRESCA (F5)
+
+
+✅ DEBERÍAS VER:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 26 marcadores en el mapa
+💼 Botón "Ofertas Docentes" en cada popup
+🎓 30+ ofertas cuando haces click en el botón
+
+
+🎯 PRUEBA ESTO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click en marcador UCV 📍
+2. Aparece popup con botón "💼 Ofertas Docentes (3)"
+3. Click en el botón
+4. Ves 3 ofertas de la UCV en bloques
+5. ¡Funciona! ✅
+
+
+📚 MÁS INFORMACIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 PASOS_VISUALES.txt          → Guía con capturas
+📄 LEER_PRIMERO.txt            → Instrucciones paso a paso
+📄 RESUMEN_EJECUTIVO.md        → Resumen técnico completo
+📄 INSTRUCCIONES_COMPLETAS_FINAL.md → Todo explicado en detalle
+
+
+💡 INSTITUCIONES INCLUIDAS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Caracas (14): UCV, USB, UCAB, Unimet, USM, UNEXPO, UPEL, UAH,
+              Emil Friedman, San Ignacio, Moral y Luces, La Salle,
+              IUPOLC, IUTEIND
+
+Maracaibo (4): LUZ, URBE, UNIR, IUTM
+
+Valencia (3): UC, UAM, IUTV
+
+Barquisimeto (2): UCLA, UFT
+
+Mérida (1): ULA
+
+Maracay (2): UBA, IPM
+
+
+💼 OFERTAS POR INSTITUCIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+UCV:          3 ofertas (Matemáticas, Física, Química)
+USB:          2 ofertas (Programación, Estructuras)
+UCAB:         3 ofertas (Inglés, Filosofía, Derecho)
+Unimet:       2 ofertas (Administración, Marketing)
+USM:          2 ofertas (Arquitectura, Ingeniería)
+Emil F.:      2 ofertas (Primaria, Educ. Física)
+San Ignacio:  2 ofertas (Química, Biología)
+IUPOLC:       2 ofertas (Redes, Seguridad)
+LUZ:          2 ofertas (Ing. Petrolera, Medicina)
+UC:           2 ofertas (Contaduría, Psicología)
+UCLA:         1 oferta  (Agronomía)
+ULA:          2 ofertas (Historia, Geología)
+UPEL:         1 oferta  (Pedagogía)
+Moral y Luces: 1 oferta (Matemáticas)
+La Salle:     1 oferta  (Música)
+UAH:          1 oferta  (Diseño Gráfico)
+
+
+🎉 ¡TODO ESTÁ LISTO!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Solo ejecuta el SQL y refresca el navegador.
+
+Verás:
+- 26 instituciones marcadas en el mapa
+- Botón "Ofertas Docentes" en cada institución
+- Ofertas organizadas por bloques (institución)
+- Sistema completo funcionando
+
+¡Disfruta! 🚀
+
+
