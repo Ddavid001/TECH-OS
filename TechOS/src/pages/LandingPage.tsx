@@ -4,7 +4,8 @@ import { useLocation } from 'react-router-dom';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { ApplicantsModal } from '@/components/ApplicantsModal';
 import { OffersModal } from '@/components/OffersModal';
-import { AcademicDemoButton } from '@/components/AcademicDemoButton';
+import { DemoModal } from '@/components/DemoModal';
+import { GraduationCap } from 'lucide-react';
 
 const LandingPage = () => {
   const { t } = useTranslation();
@@ -12,6 +13,7 @@ const LandingPage = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showApplicants, setShowApplicants] = useState(false);
   const [showOffers, setShowOffers] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -27,6 +29,7 @@ const LandingPage = () => {
     const hash = location.hash;
     if (hash === '#postulaciones') setShowApplicants(true);
     if (hash === '#ofertas') setShowOffers(true);
+    if (hash === '#demo') setShowDemo(true);
   }, [location.hash]);
 
   return (
@@ -69,11 +72,6 @@ const LandingPage = () => {
             <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto leading-relaxed px-4 mb-8">
               Our platform ensures that learning never stops, connecting teachers, students, and representatives in real-time.
             </p>
-
-            {/* Academic Demo Button */}
-            <div className="mt-8">
-              <AcademicDemoButton />
-            </div>
           </div>
       </section>
 
@@ -86,9 +84,26 @@ const LandingPage = () => {
         </div>
       </footer>
 
+      {/* Botón Flotante de Demo - Minimalista */}
+      <button
+        onClick={() => setShowDemo(true)}
+        className="fixed bottom-6 right-6 z-50 group flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 rounded-full shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:scale-105"
+      >
+        <GraduationCap className="w-5 h-5 text-primary" />
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">TechOS Demo</span>
+        
+        {/* Tooltip minimalista */}
+        <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-gray-900 text-white text-xs rounded-lg py-1.5 px-3 whitespace-nowrap">
+            Explorar demo
+          </div>
+        </div>
+      </button>
+
       {/* Modals */}
       <ApplicantsModal open={showApplicants} onOpenChange={setShowApplicants} />
       <OffersModal open={showOffers} onOpenChange={setShowOffers} />
+      <DemoModal open={showDemo} onOpenChange={setShowDemo} />
     </div>
   );
 };

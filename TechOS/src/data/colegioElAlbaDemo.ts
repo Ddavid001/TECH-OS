@@ -5,7 +5,189 @@ export const COLEGIO_EL_ALBA = {
   name: 'Colegio El Alba',
   type: 'school',
   address: 'Av. Principal de Las Mercedes, Caracas, Venezuela',
+  latitude: 10.498,  // Las Mercedes, Caracas
+  longitude: -66.829,
+  attendanceRadiusMeters: 100,
 };
+
+// Usuarios del sistema
+export const DEMO_USERS = {
+  director: {
+    id: 'director-001',
+    email: 'director@elalba.edu.ve',
+    password: 'demo123',
+    role: 'admin',
+    firstName: 'Roberto',
+    lastName: 'Mendoza',
+    institutionId: COLEGIO_EL_ALBA.id,
+  },
+  teachers: [
+    {
+      id: 'teacher-001',
+      email: 'prof.laura@elalba.edu.ve',
+      password: 'demo123',
+      role: 'teacher',
+      firstName: 'Laura',
+      lastName: 'Ramírez',
+      institutionId: COLEGIO_EL_ALBA.id,
+      subject: 'Matemáticas',
+    },
+    {
+      id: 'teacher-002',
+      email: 'prof.roberto@elalba.edu.ve',
+      password: 'demo123',
+      role: 'teacher',
+      firstName: 'Roberto',
+      lastName: 'García',
+      institutionId: COLEGIO_EL_ALBA.id,
+      subject: 'Lenguaje y Literatura',
+    },
+    {
+      id: 'teacher-003',
+      email: 'prof.carmen@elalba.edu.ve',
+      password: 'demo123',
+      role: 'teacher',
+      firstName: 'Carmen',
+      lastName: 'Silva',
+      institutionId: COLEGIO_EL_ALBA.id,
+      subject: 'Ciencias Naturales',
+    },
+    {
+      id: 'teacher-004',
+      email: 'prof.antonio@elalba.edu.ve',
+      password: 'demo123',
+      role: 'teacher',
+      firstName: 'Antonio',
+      lastName: 'Díaz',
+      institutionId: COLEGIO_EL_ALBA.id,
+      subject: 'Historia de Venezuela',
+    },
+  ],
+  students: [
+    {
+      id: 'student-001',
+      email: 'maria.gonzalez@estudiante.elalba.edu.ve',
+      password: 'demo123',
+      role: 'student',
+      firstName: 'María',
+      lastName: 'González',
+      institutionId: COLEGIO_EL_ALBA.id,
+      grade: '4to Grado',
+    },
+    {
+      id: 'student-002',
+      email: 'jose.rodriguez@estudiante.elalba.edu.ve',
+      password: 'demo123',
+      role: 'student',
+      firstName: 'José',
+      lastName: 'Rodríguez',
+      institutionId: COLEGIO_EL_ALBA.id,
+      grade: '4to Grado',
+    },
+    {
+      id: 'student-003',
+      email: 'ana.martinez@estudiante.elalba.edu.ve',
+      password: 'demo123',
+      role: 'student',
+      firstName: 'Ana',
+      lastName: 'Martínez',
+      institutionId: COLEGIO_EL_ALBA.id,
+      grade: '4to Grado',
+    },
+    {
+      id: 'student-004',
+      email: 'carlos.perez@estudiante.elalba.edu.ve',
+      password: 'demo123',
+      role: 'student',
+      firstName: 'Carlos',
+      lastName: 'Pérez',
+      institutionId: COLEGIO_EL_ALBA.id,
+      grade: '4to Grado',
+    },
+    {
+      id: 'student-005',
+      email: 'sofia.lopez@estudiante.elalba.edu.ve',
+      password: 'demo123',
+      role: 'student',
+      firstName: 'Sofía',
+      lastName: 'López',
+      institutionId: COLEGIO_EL_ALBA.id,
+      grade: '4to Grado',
+    },
+  ],
+};
+
+// Horarios de clases (formato: día 0=Domingo, 1=Lunes, etc.)
+export const DEMO_SCHEDULES = [
+  // Matemáticas - Lunes y Miércoles 8:00-9:30
+  {
+    id: 'schedule-001',
+    courseId: 'course-1',
+    teacherId: 'teacher-001',
+    dayOfWeek: 1, // Lunes
+    startTime: '08:00',
+    endTime: '09:30',
+  },
+  {
+    id: 'schedule-002',
+    courseId: 'course-1',
+    teacherId: 'teacher-001',
+    dayOfWeek: 3, // Miércoles
+    startTime: '08:00',
+    endTime: '09:30',
+  },
+  // Lenguaje - Martes y Jueves 8:00-9:30
+  {
+    id: 'schedule-003',
+    courseId: 'course-2',
+    teacherId: 'teacher-002',
+    dayOfWeek: 2, // Martes
+    startTime: '08:00',
+    endTime: '09:30',
+  },
+  {
+    id: 'schedule-004',
+    courseId: 'course-2',
+    teacherId: 'teacher-002',
+    dayOfWeek: 4, // Jueves
+    startTime: '08:00',
+    endTime: '09:30',
+  },
+  // Ciencias - Lunes y Miércoles 10:00-11:30
+  {
+    id: 'schedule-005',
+    courseId: 'course-3',
+    teacherId: 'teacher-003',
+    dayOfWeek: 1, // Lunes
+    startTime: '10:00',
+    endTime: '11:30',
+  },
+  {
+    id: 'schedule-006',
+    courseId: 'course-3',
+    teacherId: 'teacher-003',
+    dayOfWeek: 3, // Miércoles
+    startTime: '10:00',
+    endTime: '11:30',
+  },
+  // Historia - Martes y Jueves 10:00-11:30
+  {
+    id: 'schedule-007',
+    courseId: 'course-4',
+    teacherId: 'teacher-004',
+    dayOfWeek: 2, // Martes
+    startTime: '10:00',
+    endTime: '11:30',
+  },
+  {
+    id: 'schedule-008',
+    courseId: 'course-4',
+    teacherId: 'teacher-004',
+    dayOfWeek: 4, // Jueves
+    startTime: '10:00',
+    endTime: '11:30',
+  },
+];
 
 export const DEMO_COURSES = [
   { id: 'course-1', name: 'Matemáticas 4to Grado' },

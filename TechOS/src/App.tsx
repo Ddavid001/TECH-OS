@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Footer } from "@/components/Footer";
 
+const DemoLandingPage = lazy(() => import("./pages/DemoLandingPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -33,6 +34,9 @@ const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 const MaterialsPage = lazy(() => import("./pages/MaterialsPage"));
 const GradebookPage = lazy(() => import("./pages/GradebookPage"));
 const StudentGradesPage = lazy(() => import("./pages/StudentGradesPage"));
+const SandboxSetupStep1 = lazy(() => import("./pages/SandboxSetupStep1"));
+const SandboxSetupStep2 = lazy(() => import("./pages/SandboxSetupStep2"));
+const SandboxSetupStep3 = lazy(() => import("./pages/SandboxSetupStep3"));
 const ProfilePage = lazy(() => import("./pages/Profile"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 const TestImage = lazy(() => import("./pages/TestImage"));
@@ -49,6 +53,7 @@ const App = () => (
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/demo" element={<DemoLandingPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/complete-registration" element={<CompleteRegistration />} />
@@ -64,6 +69,9 @@ const App = () => (
                 <Route path="/applications" element={<ApplicationsPortal />} />
                 <Route path="/applications/teacher" element={<TeacherApplication />} />
                 <Route path="/applications/institution" element={<InstitutionApplication />} />
+                <Route path="/setup-sandbox" element={<SandboxSetupStep1 />} />
+                <Route path="/setup-sandbox/step2" element={<SandboxSetupStep2 />} />
+                <Route path="/setup-sandbox/step3" element={<SandboxSetupStep3 />} />
                 <Route
                   path="/admin/dashboard"
                   element={

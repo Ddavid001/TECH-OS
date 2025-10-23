@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import 'leaflet/dist/leaflet.css'; // Estilos de Leaflet
 import { AuthProvider } from './hooks/useAuth'; // Asegúrate que la importación sea correcta
 import { BrowserRouter } from 'react-router-dom';
 import './i18n/config'; // Configuración de i18next
