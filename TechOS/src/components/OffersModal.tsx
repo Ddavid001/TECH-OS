@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Briefcase, Eye, Lock, Share2, Building, Clock } from 'lucide-react';
+import { Briefcase, Eye, Share2, Building, Clock } from 'lucide-react';
 import { LOCAL_JOB_OFFERS } from '@/data/local-job-offers';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -84,37 +84,18 @@ export const OffersModal = ({ open, onOpenChange }: OffersModalProps) => {
                     <div className="flex flex-wrap gap-1">
                       {offer.branch && <Badge variant="secondary">{offer.branch}</Badge>}
                       {offer.schedule && <Badge variant="secondary">{offer.schedule}</Badge>}
-                      {offer.tentative_salary && (
-                        user ? (
-                          <Badge variant="secondary">{offer.tentative_salary}</Badge>
-                        ) : (
-                          <Badge variant="secondary" className="flex items-center gap-1">
-                            <Lock className="h-3 w-3" />
-                            Precio
-                          </Badge>
-                        )
-                      )}
+                      {/* precio eliminado intencionalmente */}
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" className="flex-1" onClick={() => setSelected(offer)}>
                         <Eye className="h-4 w-4 mr-2" />
                         Ver Detalle
                       </Button>
-                      <Button size="sm" variant="outline" className="flex-1" onClick={() => (window.location.href = '/applications/teacher')}>
+                      <Button size="sm" variant="outline" className="flex-1" onClick={() => (window.location.href = '/ofertas')}>
                         Postularme
                       </Button>
                     </div>
-                    {!user && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="w-full"
-                        onClick={() => (window.location.href = '/register')}
-                      >
-                        <Lock className="h-4 w-4 mr-2" />
-                        Crear cuenta para ver salario
-                      </Button>
-                    )}
+                    {/* gating de salarios eliminado */}
                   </CardContent>
                 </Card>
               ))}
@@ -139,12 +120,7 @@ export const OffersModal = ({ open, onOpenChange }: OffersModalProps) => {
               {selected.schedule && (
                 <div className="flex items-center gap-1"><Clock className="h-4 w-4" /><span>{selected.schedule}</span></div>
               )}
-              {selected.tentative_salary && (
-                <div>
-                  <span className="font-semibold">Salario: </span>
-                  {user ? selected.tentative_salary : 'Regístrate para ver' }
-                </div>
-              )}
+              {/* salario oculto */}
             </div>
 
             <div>
@@ -164,15 +140,10 @@ export const OffersModal = ({ open, onOpenChange }: OffersModalProps) => {
             </div>
 
             <div className="flex gap-2 pt-2 border-t">
-              <Button size="sm" onClick={() => (window.location.href = '/applications/teacher')}>
+              <Button size="sm" onClick={() => (window.location.href = '/ofertas')}>
                 Postularme
               </Button>
-              {!user && (
-                <Button size="sm" variant="secondary" onClick={() => (window.location.href = '/register')}>
-                  <Lock className="h-4 w-4 mr-2" />
-                  Crear cuenta para ver salario
-                </Button>
-              )}
+              {/* gating eliminado */}
               <Button
                 size="sm"
                 variant="outline"

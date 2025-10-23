@@ -15,6 +15,7 @@ const CompleteRegistration = lazy(() => import("./pages/CompleteRegistration"));
 const MapPage = lazy(() => import("./pages/MapPage"));
 const CaracasMapPage = lazy(() => import("./pages/CaracasMapPage"));
 const JobOffersPage = lazy(() => import("./pages/JobOffersPage"));
+const JobOfferDetailPage = lazy(() => import("./pages/JobOfferDetailPage"));
 const ApplicationsPortal = lazy(() => import("./pages/ApplicationsPortal"));
 const TeacherApplication = lazy(() => import("./pages/TeacherApplication"));
 const InstitutionApplication = lazy(() => import("./pages/InstitutionApplication"));
@@ -48,6 +49,7 @@ const App = () => (
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/caracas-map" element={<CaracasMapPage />} />
                 <Route path="/ofertas" element={<JobOffersPage />} />
+                <Route path="/oferta/:id" element={<JobOfferDetailPage />} />
                 <Route path="/job-offers" element={<Navigate to="/ofertas" replace />} />
                 <Route path="/mis-postulaciones" element={<MyApplicationsPage />} />
                 <Route path="/test-image" element={<TestImage />} />

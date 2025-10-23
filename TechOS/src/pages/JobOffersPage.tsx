@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react';
 import { restFetchJobOffers, restFetchJobOffersByInstitutionId } from '@/lib/rest-client';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Eye, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LOCAL_JOB_OFFERS } from '@/data/local-job-offers';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const DEMO_OFFERS = LOCAL_JOB_OFFERS;
 
 const JobOffersPage = () => {
+  const navigate = useNavigate();
   const [jobOffers, setJobOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [searchParams] = useSearchParams();
   const institutionId = searchParams.get('institutionId') || undefined;
+  const [query, setQuery] = useState('');
+  const [stateFilter, setStateFilter] = useState('all');
+  const [cityFilter, setCityFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'school' | 'university' | 'institute'>('all');
 
   useEffect(() => {
     const fetchJobOffers = async () => {
@@ -74,6 +81,17 @@ const JobOffersPage = () => {
     );
   }
 
+  const states = ['all', ...Array.from(new Set((jobOffers as any[]).map(o => o.state).filter(Boolean))) as string[]];
+  const cities = ['all', ...Array.from(new Set((jobOffers as any[]).filter(o => stateFilter === 'all' || o.state === stateFilter).map(o => o.city).filter(Boolean))) as string[]];
+  const filtered = (jobOffers as any[]).filter(o => {
+    const q = query.trim().toLowerCase();
+    const matchesQ = q === '' || o.position_title.toLowerCase().includes(q) || o.institution_name.toLowerCase().includes(q);
+    const matchesS = stateFilter === 'all' || o.state === stateFilter;
+    const matchesC = cityFilter === 'all' || o.city === cityFilter;
+    const matchesT = typeFilter === 'all' || o.institution_type === typeFilter;
+    return matchesQ && matchesS && matchesC && matchesT;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-12">
@@ -86,7 +104,35 @@ const JobOffersPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <Input placeholder="Buscar por cargo o institución..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-12" />
+          <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
+            <SelectTrigger className="h-12"><SelectValue placeholder="Tipo de institución" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los tipos</SelectItem>
+              <SelectItem value="university">Universidades</SelectItem>
+              <SelectItem value="school">Escuelas</SelectItem>
+              <SelectItem value="institute">Institutos</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={stateFilter} onValueChange={setStateFilter}>
+            <SelectTrigger className="h-12"><SelectValue placeholder="Estado" /></SelectTrigger>
+            <SelectContent>
+              {states.map(s => (
+                <SelectItem key={s} value={s}>{s === 'all' ? 'Todos los estados' : s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={cityFilter} onValueChange={setCityFilter}>
+            <SelectTrigger className="h-12"><SelectValue placeholder="Ciudad" /></SelectTrigger>
+            <SelectContent>
+              {cities.map(c => (
+                <SelectItem key={c} value={c}>{c === 'all' ? 'Todas las ciudades' : c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {demoMode && (
           <div className="mb-6 rounded-md border border-dashed p-3 text-sm bg-yellow-50 border-yellow-300 text-yellow-800">
             Modo demostración: mostrando ofertas locales.
@@ -94,21 +140,20 @@ const JobOffersPage = () => {
         )}
 
         <div className="space-y-4">
-          {jobOffers.length > 0 ? (
-            jobOffers.map((offer) => (
+          {filtered.length > 0 ? (
+            filtered.map((offer) => (
               <Card key={offer.id} className="overflow-hidden">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-lg">
-                          {offer.position_title}
-                        </CardTitle>
-                      </div>
-                      <CardDescription className="text-base">
-                        {(offer.institutions as any)?.name || offer.institution_name}
+                      <CardTitle className="text-lg">{offer.position_title}</CardTitle>
+                      <CardDescription className="text-sm flex items-center gap-2 mt-1">
+                        <MapPin className="h-3 w-3" /> {offer.institution_name} · {offer.city || '—'}, {offer.state || '—'}
                       </CardDescription>
                     </div>
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/oferta/${offer.id}`)}>
+                      <Eye className="h-4 w-4 mr-2" /> Ver detalle
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -122,17 +167,11 @@ const JobOffersPage = () => {
                     {offer.schedule && (
                       <div><span className="font-semibold">Horario: </span>{offer.schedule}</div>
                     )}
-                    {offer.tentative_salary && (
-                      <div><span className="font-semibold">Salario: </span>{offer.tentative_salary}</div>
-                    )}
                   </div>
 
                   <div className="flex gap-2 pt-2 border-t">
-                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/applications/teacher'}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/oferta/${offer.id}`)}>
                       Postularme
-                    </Button>
-                    <Button variant="secondary" size="sm" onClick={() => window.open('https://maps.google.com', '_blank')}>
-                      Ver Ubicación
                     </Button>
                   </div>
                 </CardContent>

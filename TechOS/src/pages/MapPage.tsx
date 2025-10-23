@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { isRestEnabled, restFetchInstitutions } from '@/lib/rest-client';
 import { MapPin, Search, Filter, X, Loader2, Building, GraduationCap, BookOpen, Navigation as NavigationIcon, MapPinned, Route, Globe, Briefcase } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -27,6 +27,8 @@ interface Institution {
   type: 'school' | 'university' | 'institute';
   latitude: number;
   longitude: number;
+  state?: string;
+  city?: string;
 }
 
 interface MapMarker {
@@ -102,6 +104,8 @@ const MapPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<'all' | 'school' | 'university' | 'institute'>('all');
+  const [stateFilter, setStateFilter] = useState<string>('all');
+  const [cityFilter, setCityFilter] = useState<string>('all');
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState<Institution[]>([]);
@@ -112,6 +116,8 @@ const MapPage: React.FC = () => {
   const [mapCenter, setMapCenter] = useState<[number, number]>([10.4806, -66.9036]); // Caracas
   const [mapZoom, setMapZoom] = useState(12);
   const [userCountry, setUserCountry] = useState<string>('Venezuela');
+  const [routeCoords, setRouteCoords] = useState<[number, number][] | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
 
   /**
    * Detect user's location using IP Geolocation API
@@ -230,6 +236,8 @@ const MapPage: React.FC = () => {
       type: i.type,
       latitude: i.latitude,
       longitude: i.longitude,
+      state: i.state,
+      city: i.city,
     })) as Institution[];
     setInstitutions(mapped);
     toast({ title: '📍 Instituciones locales', description: `Mostrando ${mapped.length} ubicaciones en Venezuela` });
@@ -287,7 +295,9 @@ const MapPage: React.FC = () => {
     const matchesSearch = searchTerm === '' || 
       inst.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedType === 'all' || inst.type === selectedType;
-    return matchesSearch && matchesType;
+    const matchesState = stateFilter === 'all' || inst.state === stateFilter;
+    const matchesCity = cityFilter === 'all' || inst.city === cityFilter;
+    return matchesSearch && matchesType && matchesState && matchesCity;
   });
 
   /**
@@ -313,6 +323,12 @@ const MapPage: React.FC = () => {
     setSelectedMarker(marker);
     setMapCenter([marker.latitude, marker.longitude]);
     setMapZoom(16);
+    // Auto draw route if we already have user location
+    if (userLocation) {
+      void drawRouteFromUser(marker);
+    } else {
+      setRouteCoords(null);
+    }
   }, []);
 
   /**
@@ -321,6 +337,8 @@ const MapPage: React.FC = () => {
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedType('all');
+    setStateFilter('all');
+    setCityFilter('all');
     setSelectedMarker(null);
     setShowSuggestions(false);
   };
@@ -335,6 +353,31 @@ const MapPage: React.FC = () => {
     } else {
       const url = `https://www.google.com/maps/search/?api=1&query=${institution.latitude},${institution.longitude}`;
       window.open(url, '_blank');
+    }
+  }, [userLocation]);
+
+  /**
+   * Draw driving route on the map using OSRM public API
+   */
+  const drawRouteFromUser = useCallback(async (marker: MapMarker) => {
+    if (!userLocation) return;
+    try {
+      setRouteLoading(true);
+      setRouteCoords(null);
+      const url = `https://router.project-osrm.org/route/v1/driving/${userLocation.longitude},${userLocation.latitude};${marker.longitude},${marker.latitude}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const coords = data?.routes?.[0]?.geometry?.coordinates as [number, number][] | undefined;
+      if (coords && coords.length > 0) {
+        // OSRM returns [lon, lat]; leaflet Polyline needs [lat, lon]
+        const latlngs = coords.map(([lon, lat]) => [lat, lon] as [number, number]);
+        setRouteCoords(latlngs);
+      }
+    } catch (e) {
+      console.error('Error fetching route', e);
+      setRouteCoords(null);
+    } finally {
+      setRouteLoading(false);
     }
   }, [userLocation]);
 
@@ -499,6 +542,32 @@ const MapPage: React.FC = () => {
                   </Select>
                 </div>
 
+                {/* Filtros por Estado y Ciudad (coherentes con Directorio) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Estado</label>
+                    <Select value={stateFilter} onValueChange={setStateFilter}>
+                      <SelectTrigger><SelectValue placeholder="Todos los estados" /></SelectTrigger>
+                      <SelectContent>
+                        {['all', ...Array.from(new Set(institutions.map(i => i.state).filter(Boolean))) as string[]].map((s) => (
+                          <SelectItem key={s} value={s}>{s === 'all' ? 'Todos los estados' : s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Ciudad</label>
+                    <Select value={cityFilter} onValueChange={setCityFilter}>
+                      <SelectTrigger><SelectValue placeholder="Todas las ciudades" /></SelectTrigger>
+                      <SelectContent>
+                        {['all', ...Array.from(new Set(institutions.filter(i => stateFilter === 'all' || i.state === stateFilter).map(i => i.city).filter(Boolean))) as string[]].map((c) => (
+                          <SelectItem key={c} value={c}>{c === 'all' ? 'Todas las ciudades' : c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 {/* Location Button */}
                 <Button
                   variant="outline"
@@ -655,7 +724,7 @@ const MapPage: React.FC = () => {
                               <Button
                                 size="sm"
                                 variant="default"
-                                onClick={() => navigate(`/ofertas?institutionId=${marker.id}`)}
+                                onClick={() => navigate('/#ofertas')}
                                 className="w-full"
                               >
                                 <Briefcase className="h-4 w-4 mr-2" />
@@ -670,11 +739,28 @@ const MapPage: React.FC = () => {
                                 <Route className="h-4 w-4 mr-2" />
                                 Cómo llegar
                               </Button>
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={async () => {
+                                  if (!userLocation) {
+                                    await requestUserLocation();
+                                  }
+                                  await drawRouteFromUser(marker);
+                                }}
+                                className="w-full"
+                              >
+                                {routeLoading ? 'Calculando ruta...' : 'Trazar ruta en el mapa'}
+                              </Button>
                             </div>
                           </div>
                         </Popup>
                       </Marker>
                     ))}
+                    {/* Route polyline */}
+                    {routeCoords && (
+                      <Polyline positions={routeCoords} pathOptions={{ color: '#2563eb', weight: 5 }} />
+                    )}
                   </MapContainer>
                 )}
               </CardContent>

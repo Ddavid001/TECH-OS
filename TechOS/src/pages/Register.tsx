@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -6,14 +6,37 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, CheckCircle2, UploadCloud } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
   const { user, userRole, loading, register: registerUser } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(1);
+
+  // Step 1: account
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<'teacher' | 'student' | 'representative'>('teacher');
+
+  // Step 2: profile
+  const [title, setTitle] = useState('');
+  const [about, setAbout] = useState('');
+  const [experienceYears, setExperienceYears] = useState<number>(0);
+  const [specialties, setSpecialties] = useState<string>('');
+  const [educationLevel, setEducationLevel] = useState('Licenciado');
+
+  // Step 3: documents
+  const [idFront, setIdFront] = useState<File | null>(null);
+  const [idBack, setIdBack] = useState<File | null>(null);
+  const [residence, setResidence] = useState<File | null>(null);
+  const [cv, setCv] = useState<File | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -28,61 +51,18 @@ const Register = () => {
     }
   }, [user, userRole, navigate]);
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const canNextFromAccount = useMemo(() => {
+    return firstName && lastName && email.includes('@') && password.length >= 6 && password === confirmPassword;
+  }, [firstName, lastName, email, password, confirmPassword]);
+
+  const handleCreateAccount = async () => {
     setIsLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
-    const role = formData.get('role') as string;
-
-    if (password !== confirmPassword) {
-      toast({
-        title: 'Error',
-        description: 'Las contraseñas no coinciden',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        title: 'Error',
-        description: 'La contraseña debe tener al menos 6 caracteres',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      await registerUser(email, password, firstName, lastName, role as any);
-      toast({
-        title: 'Éxito',
-        description: 'Cuenta creada en modo local.',
-      });
-      navigate('/login');
-    } catch (error: any) {
-      console.error('Error en registro:', error);
-      
-      let errorMessage = 'No se pudo crear la cuenta';
-      
-      if (error.message?.includes('already registered')) {
-        errorMessage = 'Este email ya está registrado. Intenta iniciar sesión.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: 'Error al registrar',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      await registerUser(email, password, firstName, lastName, role);
+      toast({ title: 'Cuenta creada', description: 'Se creó tu cuenta en modo local.' });
+      setStep(2);
+    } catch (e: any) {
+      toast({ title: 'Error al registrar', description: e.message || 'Intenta nuevamente', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -123,52 +103,50 @@ const Register = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-md">
-        <Card>
-          <CardHeader>
-            <CardTitle>Crear Cuenta</CardTitle>
-            <CardDescription>Regístrate para acceder a la plataforma</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleRegister} className="space-y-4">
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Step Indicator */}
+        <div className="mb-6 grid grid-cols-4 gap-2 text-center text-xs">
+          {[1,2,3,4].map(n => (
+            <div key={n} className={`rounded-full py-2 ${n <= step ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{`Paso ${n}`}</div>
+          ))}
+        </div>
+
+        {/* Step 1 - Account */}
+        {step === 1 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Crear Cuenta</CardTitle>
+              <CardDescription>Datos básicos para tu cuenta</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Juan"
-                    required
-                  />
+                  <Label>Nombre</Label>
+                  <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Juan" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido</Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Pérez"
-                    required
-                  />
+                  <Label>Apellido</Label>
+                  <Input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Pérez" />
                 </div>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="juan@ejemplo.com"
-                  required
-                />
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@gmail.com" />
               </div>
-
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Contraseña</Label>
+                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Confirmar</Label>
+                  <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="role">Rol</Label>
-                <Select name="role" required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona tu rol" />
-                  </SelectTrigger>
+                <Label>Rol</Label>
+                <Select value={role} onValueChange={(v: any) => setRole(v)}>
+                  <SelectTrigger><SelectValue placeholder="Selecciona tu rol" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="teacher">Profesor</SelectItem>
                     <SelectItem value="student">Estudiante</SelectItem>
@@ -176,60 +154,116 @@ const Register = () => {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" asChild><Link to="/login">Ya tengo cuenta</Link></Button>
+                <Button onClick={handleCreateAccount} disabled={!canNextFromAccount || isLoading}>{isLoading ? 'Creando...' : 'Continuar'}</Button>
               </div>
+            </CardContent>
+          </Card>
+        )}
 
+        {/* Step 2 - Professional Profile */}
+        {step === 2 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Perfil Profesional</CardTitle>
+              <CardDescription>Cuéntanos sobre tu experiencia</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+                <Label>Título profesional</Label>
+                <Input placeholder="Profesor de Matemáticas de Secundaria" value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
+              <div className="space-y-2">
+                <Label>Acerca de</Label>
+                <Textarea placeholder="Resumen profesional" value={about} onChange={(e) => setAbout(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Años de experiencia</Label>
+                  <Input type="number" value={experienceYears} onChange={(e) => setExperienceYears(parseInt(e.target.value || '0'))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Nivel educativo</Label>
+                  <Select value={educationLevel} onValueChange={setEducationLevel as any}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Licenciado">Licenciado</SelectItem>
+                      <SelectItem value="Magister">Magister</SelectItem>
+                      <SelectItem value="Doctorado">Doctorado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Especialidades (separadas por coma)</Label>
+                <Input placeholder="Matemáticas, Física" value={specialties} onChange={(e) => setSpecialties(e.target.value)} />
+              </div>
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setStep(1)}>Atrás</Button>
+                <Button onClick={() => setStep(3)} disabled={!title}>Continuar</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
-              </Button>
-            </form>
+        {/* Step 3 - Documents */}
+        {step === 3 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Documentos Obligatorios</CardTitle>
+              <CardDescription>Sube tus documentos (simulado en modo local)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Cédula - Frente</Label>
+                  <Input type="file" accept="image/*,application/pdf" onChange={(e) => setIdFront(e.target.files?.[0] || null)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cédula - Reverso</Label>
+                  <Input type="file" accept="image/*,application/pdf" onChange={(e) => setIdBack(e.target.files?.[0] || null)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Constancia de Residencia</Label>
+                  <Input type="file" accept="image/*,application/pdf" onChange={(e) => setResidence(e.target.files?.[0] || null)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Currículum (PDF)</Label>
+                  <Input type="file" accept="application/pdf" onChange={(e) => setCv(e.target.files?.[0] || null)} />
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setStep(2)}>Atrás</Button>
+                <Button onClick={() => setStep(4)} disabled={!idFront || !idBack || !residence || !cv}><UploadCloud className="h-4 w-4 mr-2" />Continuar</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-            {/* Google OAuth deshabilitado - no configurado en Supabase
-            <div className="my-4 flex items-center">
-              <div className="flex-grow border-t border-muted"></div>
-              <span className="mx-4 text-xs uppercase text-muted-foreground">O</span>
-              <div className="flex-grow border-t border-muted"></div>
-            </div>
-
-            <Button variant="outline" className="w-full" onClick={handleGoogleRegister} disabled={isLoading}>
-              <span className="mr-2 h-5 w-5">G</span>
-              Continuar con Google
-            </Button>
-            */}
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                ¿Ya tienes cuenta?{' '}
-                <Link to="/login" className="text-primary hover:underline">
-                  Inicia sesión
-                </Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Step 4 - Review */}
+        {step === 4 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Verificación y Aprobación</CardTitle>
+              <CardDescription>Tu perfil será revisado por nuestro equipo</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-md border p-4 bg-muted">
+                <p className="flex items-center text-sm"><CheckCircle2 className="h-4 w-4 text-green-600 mr-2" /> Tu perfil se ha enviado para verificación.</p>
+                <p className="text-sm text-muted-foreground mt-1">Recibirás un correo cuando sea aprobado.</p>
+              </div>
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setStep(3)}>Atrás</Button>
+                <Button onClick={() => navigate('/login')}>Finalizar</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 };
 
 export default Register;
+

@@ -8,6 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
     --background: 240 20% 99%;
     --foreground: 234 30% 12%;
 
@@ -100,6 +101,21 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+/* Typographic scale and headings */
+@layer base {
+  h1 { @apply text-4xl md:text-5xl font-bold tracking-tight; }
+  h2 { @apply text-3xl md:text-4xl font-semibold tracking-tight; }
+  h3 { @apply text-2xl font-semibold; }
+  h4 { @apply text-xl font-semibold; }
+  h5 { @apply text-lg font-medium; }
+  h6 { @apply text-base font-medium; }
+
+  p { @apply leading-7; }
+  small { @apply text-sm text-muted-foreground; }
+  a { @apply text-primary hover:underline; }
+  button:focus { @apply ring-2 ring-primary ring-offset-2; }
 }
