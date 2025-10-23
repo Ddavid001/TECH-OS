@@ -118,6 +118,7 @@ const MapPage: React.FC = () => {
   const [userCountry, setUserCountry] = useState<string>('Venezuela');
   const [routeCoords, setRouteCoords] = useState<[number, number][] | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
+  const [geoWatchId, setGeoWatchId] = useState<number | null>(null);
 
   /**
    * Detect user's location using IP Geolocation API
@@ -380,6 +381,39 @@ const MapPage: React.FC = () => {
       setRouteLoading(false);
     }
   }, [userLocation]);
+
+  // Recalculate route whenever selected marker or user position changes
+  useEffect(() => {
+    if (selectedMarker && userLocation) {
+      void drawRouteFromUser(selectedMarker);
+    }
+  }, [selectedMarker, userLocation, drawRouteFromUser]);
+
+  // Watch user movement (like Ridery) and re-route while a destination is selected
+  useEffect(() => {
+    if (!selectedMarker || !navigator.geolocation) {
+      if (geoWatchId !== null) {
+        navigator.geolocation.clearWatch(geoWatchId);
+        setGeoWatchId(null);
+      }
+      return;
+    }
+
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        setUserLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        void drawRouteFromUser(selectedMarker);
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+    );
+    setGeoWatchId(id);
+
+    return () => {
+      navigator.geolocation.clearWatch(id);
+      setGeoWatchId(null);
+    };
+  }, [selectedMarker, drawRouteFromUser]);
 
   /**
    * Get institution type label

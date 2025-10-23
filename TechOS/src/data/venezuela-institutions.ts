@@ -19,6 +19,10 @@ export const VENEZUELA_INSTITUTIONS: VenezuelaInstitution[] = [
   { id: 've-usm', name: 'Universidad Santa María (USM)', type: 'university', latitude: 10.5019, longitude: -66.8269, state: 'Miranda', city: 'Caracas' },
   { id: 've-ema', name: 'Colegio Emil Friedman', type: 'school', latitude: 10.476667, longitude: -66.869444, state: 'Distrito Capital', city: 'Caracas' },
   { id: 've-ign', name: 'Colegio San Ignacio de Loyola', type: 'school', latitude: 10.494722, longitude: -66.865278, state: 'Distrito Capital', city: 'Caracas' },
+  // Nuevas universidades solicitadas (Caracas)
+  { id: 've-uah', name: 'Universidad Alejandro de Humboldt (UAH)', type: 'university', latitude: 10.5023, longitude: -66.9118, state: 'Distrito Capital', city: 'Caracas' },
+  { id: 've-ujmv', name: 'Universidad José María Vargas (UJMV)', type: 'university', latitude: 10.4979, longitude: -66.8552, state: 'Distrito Capital', city: 'Caracas' },
+  { id: 've-idc', name: 'Instituto de Diseño de Caracas (IDC)', type: 'institute', latitude: 10.4907, longitude: -66.8496, state: 'Distrito Capital', city: 'Caracas' },
 
   // Maracaibo (Zulia)
   { id: 've-luz', name: 'Universidad del Zulia (LUZ)', type: 'university', latitude: 10.666667, longitude: -71.6125, state: 'Zulia', city: 'Maracaibo' },
