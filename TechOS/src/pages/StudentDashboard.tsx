@@ -9,6 +9,7 @@ import { BookOpen, Calendar, Clock, User } from 'lucide-react';
 import { db } from '@/lib/supabase-helper';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { AcademicDemoButton } from '@/components/AcademicDemoButton';
 
 interface Schedule {
   id: string;
@@ -160,6 +161,11 @@ const StudentDashboard = () => {
       </header>
 
       <main className="container mx-auto p-6 max-w-5xl">
+        {/* Academic Demo Button */}
+        <div className="flex justify-center mb-6">
+          <AcademicDemoButton />
+        </div>
+
         {/* Today's Schedule Card */}
         <Card className="mb-6">
           <CardHeader>

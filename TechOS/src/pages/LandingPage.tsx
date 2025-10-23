@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
 import { ApplicantsModal } from '@/components/ApplicantsModal';
 import { OffersModal } from '@/components/OffersModal';
+import { AcademicDemoButton } from '@/components/AcademicDemoButton';
 
 const LandingPage = () => {
   const { t } = useTranslation();
@@ -65,9 +66,14 @@ const LandingPage = () => {
             </h1>
             
             {/* Subtítulo / Descripción */}
-            <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto leading-relaxed px-4">
+            <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto leading-relaxed px-4 mb-8">
               Our platform ensures that learning never stops, connecting teachers, students, and representatives in real-time.
             </p>
+
+            {/* Academic Demo Button */}
+            <div className="mt-8">
+              <AcademicDemoButton />
+            </div>
           </div>
       </section>
 

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { AcademicDemoButton } from '@/components/AcademicDemoButton';
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -33,6 +34,11 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto p-6 space-y-8">
+        {/* Academic Demo Button */}
+        <div className="flex justify-center">
+          <AcademicDemoButton />
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>No disponible en modo local</CardTitle>

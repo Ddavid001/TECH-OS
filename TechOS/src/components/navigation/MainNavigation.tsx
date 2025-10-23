@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { NotificationBell } from '@/components/NotificationBell';
 import { 
   MapPin, 
   FileText, 
@@ -106,6 +107,7 @@ export const MainNavigation: React.FC = () => {
           <div className="hidden md:flex items-center space-x-3" role="menubar" aria-label="Menú de usuario">
             {user ? (
               <div className="flex items-center space-x-3">
+                <NotificationBell />
                 <div className="flex items-center space-x-2" aria-label={`Usuario: ${user.email}`}>
                   <User className="h-4 w-4 text-gray-300" aria-hidden="true" />
                   <span className="text-sm text-white">

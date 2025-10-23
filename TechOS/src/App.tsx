@@ -16,6 +16,8 @@ const MapPage = lazy(() => import("./pages/MapPage"));
 const CaracasMapPage = lazy(() => import("./pages/CaracasMapPage"));
 const JobOffersPage = lazy(() => import("./pages/JobOffersPage"));
 const JobOfferDetailPage = lazy(() => import("./pages/JobOfferDetailPage"));
+const SuperAdminInstitutions = lazy(() => import("./pages/SuperAdminInstitutions"));
+const AttendancePage = lazy(() => import("./pages/AttendancePage"));
 const ApplicationsPortal = lazy(() => import("./pages/ApplicationsPortal"));
 const TeacherApplication = lazy(() => import("./pages/TeacherApplication"));
 const InstitutionApplication = lazy(() => import("./pages/InstitutionApplication"));
@@ -27,6 +29,10 @@ const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
 const RepresentativeDashboard = lazy(
   () => import("./pages/RepresentativeDashboard")
 );
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const MaterialsPage = lazy(() => import("./pages/MaterialsPage"));
+const GradebookPage = lazy(() => import("./pages/GradebookPage"));
+const StudentGradesPage = lazy(() => import("./pages/StudentGradesPage"));
 const ProfilePage = lazy(() => import("./pages/Profile"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 const TestImage = lazy(() => import("./pages/TestImage"));
@@ -50,6 +56,8 @@ const App = () => (
                 <Route path="/caracas-map" element={<CaracasMapPage />} />
                 <Route path="/ofertas" element={<JobOffersPage />} />
                 <Route path="/oferta/:id" element={<JobOfferDetailPage />} />
+                <Route path="/superadmin/institutions" element={<SuperAdminInstitutions />} />
+                <Route path="/attendance" element={<AttendancePage />} />
                 <Route path="/job-offers" element={<Navigate to="/ofertas" replace />} />
                 <Route path="/mis-postulaciones" element={<MyApplicationsPage />} />
                 <Route path="/test-image" element={<TestImage />} />
@@ -96,6 +104,10 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/materials" element={<MaterialsPage />} />
+                <Route path="/gradebook" element={<GradebookPage />} />
+                <Route path="/grades" element={<StudentGradesPage />} />
                 <Route
                   path="/profile"
                   element={
